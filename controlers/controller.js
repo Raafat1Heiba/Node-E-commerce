@@ -76,7 +76,7 @@ exports.get = asyncHandler(async (req, res) => {
   }
   if (req.query.keyword) {
     let query = {};
-    if (categoryModel.modelName === "product") {
+    if (categoryModel.modelName === "Product") {
       query.$or = [
         { title: { $regex: req.query.keyword, $options: "i" } },
         { description: { $regex: req.query.keyword, $options: "i" } },

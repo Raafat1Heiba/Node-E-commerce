@@ -74,7 +74,7 @@ exports.getSubCategory = asyncHandler(async (req, res) => {
   }
   if (req.query.keyword) {
     let query = {};
-    if (SubCategory.modelName === "product") {
+    if (SubCategory.modelName === "Product") {
       query.$or = [
         { title: { $regex: req.query.keyword, $options: "i" } },
         { description: { $regex: req.query.keyword, $options: "i" } },
