@@ -56,6 +56,10 @@ const orderSchema = new mongoose.Schema(
     delveredAt: {
       type: Date,
     },
+    status: {
+      type: String,
+      default: "pending",
+    },
   },
   { timestamps: true }
 ); //this will add createdAt and updatedAt to our database
