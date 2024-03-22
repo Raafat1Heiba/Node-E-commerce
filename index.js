@@ -7,21 +7,21 @@ const compression = require("compression");
 
 dotenv.config({ path: ` ${__dirname}/config.env ` });
 // eslint-disable-next-line import/no-useless-path-segments
-const ApiError = require("../training/utils/error");
+const ApiError = require("./utils/error");
 // eslint-disable-next-line import/no-useless-path-segments
-const Error = require("../training/midleWare/errMidle");
+const Error = require("./midleWare/errMidle");
 // eslint-disable-next-line import/no-useless-path-segments
-const database = require("../training/config/database");
+const database = require("./config/database");
 // eslint-disable-next-line import/no-useless-path-segments
-const categoryRoute = require("../training/routs/route");
+const categoryRoute = require("./routs/route");
 // eslint-disable-next-line import/no-useless-path-segments
-const SubcategoryRoute = require("../training/routs/subCategoryRoute");
+const SubcategoryRoute = require("./routs/subCategoryRoute");
 // eslint-disable-next-line import/no-useless-path-segments
-const brandRoute = require("../training/routs/brandRoute");
+const brandRoute = require("./routs/brandRoute");
 // eslint-disable-next-line import/order, no-unused-vars, import/newline-after-import, import/no-useless-path-segments
-const orderRoute = require("../training/routs/orderRoute");
+const orderRoute = require("./routs/orderRoute");
 // eslint-disable-next-line import/no-useless-path-segments
-const productsRoute = require("../training/routs/productRoute");
+const productsRoute = require("./routs/productRoute");
 const reviewRoutes = require("./routs/reviewRoute");
 const userProfileRoutes = require("./routs/userProfileRoute");
 const userRouter = require("./routs/usersRoute");
