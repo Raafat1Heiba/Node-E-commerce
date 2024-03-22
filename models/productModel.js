@@ -31,7 +31,7 @@ const ProductSchema = new mongoose.Schema(
       type: Number,
       required: true,
       trim: true,
-      max: [20000, "too long product"],
+      max: [200000, "too long product"],
     },
     priceAfterDiscount: {
       type: Number,
@@ -65,6 +65,10 @@ const ProductSchema = new mongoose.Schema(
     ratingsQuantity: {
       type: Number,
       default: 0,
+    },
+    status: {
+      type: String,
+      default: "pending",
     },
   },
   { timestamps: true }

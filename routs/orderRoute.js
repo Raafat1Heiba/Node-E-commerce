@@ -8,6 +8,7 @@ const {
   updateOrderTopaid,
   updateOrderTodelevred,
   checkOut,
+  updateOrderStatus,
 } = require("../controlers/orderController");
 // router.use(authController.allowedTo("user"), authController.protect);
 router.route("/:cartId").post(createCashOrder);
@@ -27,4 +28,5 @@ router.get(
   // authService.allowTo(),
   checkOut
 );
+router.put("/:id/status", updateOrderStatus);
 module.exports = router;
