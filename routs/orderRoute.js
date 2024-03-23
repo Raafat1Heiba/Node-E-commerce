@@ -10,10 +10,12 @@ const {
   checkOut,
   updateOrderStatus,
   getOrders,
+  getUserOrders
 } = require("../controlers/orderController");
 // router.use(authController.allowedTo("user"), authController.protect);
 router.route("/:cartId").post(createCashOrder);
-router.route("/:cartId").get(getOne);
+router.route("/:id").get(getOne);
+router.route("/user/:id").get(getUserOrders);
 router.put(
   "/:id/pay",
   // authService.allowTo("admin", "manager"),
