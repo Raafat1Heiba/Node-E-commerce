@@ -185,4 +185,19 @@ exports.getUserOrders = asyncHandler(async (req, res, next) => {
     return next(new ApiError("order not found", 404));
   }
 });
+exports.getOrdersByStatus = asyncHandler(async (req, res, next) => {
+  try {
+    const status=req.params.status;
+    const orders = await Order.find({status:status});
+    if (!orders) { 
+      return next(new ApiError("order not found", 404));
+      //return res.status(400).json({ msg: "Category not found" });
+    }
+    res.status(200).json({ data: orders });
+  } catch (error) {
+    console.log(error.message);
+
+    return next(new ApiError("order not found", 404));
+  }
+});
 

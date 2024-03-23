@@ -10,11 +10,13 @@ const {
   checkOut,
   updateOrderStatus,
   getOrders,
-  getUserOrders
+  getUserOrders,
+  getOrdersByStatus
 } = require("../controlers/orderController");
 // router.use(authController.allowedTo("user"), authController.protect);
 router.route("/:cartId").post(createCashOrder);
 router.route("/:id").get(getOne);
+router.route("/status/:status").get(getOrdersByStatus);
 router.route("/user/:id").get(getUserOrders);
 router.put(
   "/:id/pay",
