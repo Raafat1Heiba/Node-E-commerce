@@ -28,5 +28,6 @@ router.get(
   // authService.allowTo(),
   checkOut
 );
+router.get("/", getOrders);
 router.put("/:id/status", updateOrderStatus);
 module.exports = router;

@@ -169,3 +169,11 @@ exports.updateOrderStatus = asyncHandler(async (req, res, next) => {
   const updatedOrder = await order.save();
   res.status(200).json({ status: "success", data: updatedOrder });
 });
+exports.getOrders = asyncHandler(async (req, res) => {
+  // const page = req.query.page * 1 || 1;
+  // const limit = req.query.limit * 1 || 5;
+  // const skip = (page - 1) * limit;
+  const orders = await Order.find();
+
+  res.status(200).json({ results: orders.length, data: orders });
+});
