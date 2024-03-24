@@ -55,7 +55,7 @@ exports.createCashOrder = asyncHandler(async (req, res, next) => {
 exports.getOne = asyncHandler(async (req, res, next) => {
   try {
     const id = req.params.id;
-    const order = await Order.findById(id);
+    const order = await Order.findById(id).populate("user");
     if (!order) {
       return next(new ApiError("order not found", 404));
       //return res.status(400).json({ msg: "Category not found" });
@@ -72,7 +72,7 @@ exports.getOrders = asyncHandler(async (req, res) => {
   // const page = req.query.page * 1 || 1;
   // const limit = req.query.limit * 1 || 5;
   // const skip = (page - 1) * limit;
-  const orders = await Order.find();
+  const orders = await Order.find().populate("user");
 
   res.status(200).json({ results: orders.length, data: orders });
 });
@@ -187,7 +187,7 @@ exports.getUserOrders = asyncHandler(async (req, res, next) => {
 exports.getOrdersByStatus = asyncHandler(async (req, res, next) => {
   try {
     const status = req.params.status;
-    const orders = await Order.find({ status: status });
+    const orders = await Order.find({ status: status }).populate("user");
     if (!orders) {
       return next(new ApiError("order not found", 404));
       //return res.status(400).json({ msg: "Category not found" });
