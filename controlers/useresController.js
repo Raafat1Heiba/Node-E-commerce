@@ -73,7 +73,8 @@ const login = async (req, res) => {
     const token = jwt.sign({ email }, "jwtSecret", { expiresIn: "1h" });
     res
       .header({ jwt: token })
-      .send({ message: "Access Granted", email, token: token, role: role });
+      .send({ message: "Access Granted", id:user.id, token: token, role: role });
+
     // res.send(token)
   } catch (userLoginError) {
     res.status(500).send(userLoginError.message);
