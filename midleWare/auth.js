@@ -1,10 +1,9 @@
 const jwt = require("jsonwebtoken");
-<<<<<<< HEAD
-=======
+
 const User = require("../models/userModel");
 
 // eslint-disable-next-line import/newline-after-import
->>>>>>> 51bbdcd56266de8c3399632244bf0df7697bd8ef
+
 const { findUserByEmail } = require("../services/userService");
 const auth = async (req, res, next) => {
   try {
