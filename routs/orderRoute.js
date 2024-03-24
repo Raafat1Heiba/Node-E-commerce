@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/newline-after-import
 const express = require("express");
 const router = express.Router();
+const auth = require("../midleWare/auth");
 //import auth controller
 const {
   createCashOrder,
@@ -29,6 +30,6 @@ router.get(
   // authService.allowTo(),
   checkOut
 );
-router.get("/", getOrders);
+router.get("/", auth.auth, getOrders);
 router.put("/:id/status", updateOrderStatus);
 module.exports = router;

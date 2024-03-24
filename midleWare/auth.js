@@ -1,6 +1,4 @@
-// eslint-disable-next-line import/no-unresolved, node/no-missing-require, import/no-extraneous-dependencies
 const jwt = require("jsonwebtoken");
-// eslint-disable-next-line import/newline-after-import
 const { findUserByEmail } = require("../services/userService");
 const auth = async (req, res, next) => {
   try {

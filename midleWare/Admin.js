@@ -1,10 +1,5 @@
 const isAdmin = (req, res, next) => {
   try {
-    // if (!req.user || !req.user.isAdmin) {
-
-    //     return res.status(403).send({ message: "Forbidden - Admin access required" });
-    // }
-    // eslint-disable-next-line prefer-destructuring, dot-notation
     const role = req.headers["role"];
     if (role !== "admin") {
       return res
@@ -18,4 +13,4 @@ const isAdmin = (req, res, next) => {
   }
 };
 
-module.exports = { isAdmin };
+module.exports = isAdmin;
