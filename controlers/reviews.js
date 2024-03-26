@@ -111,7 +111,7 @@ const deleteProductReviews = async (req, res) => {
             _id: id
         });
 
-        res.send("deleted");
+        res.json({message:"deleted"});
     } catch (error) {
         res.status(404).send({
             message: error.message
