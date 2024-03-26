@@ -3,29 +3,82 @@ const Review = require("../models/reviewModel");
 const User = require("../models/userModel");
 
 const getProductReviews = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const reviews = await Review.find({
-      product: id,
-    })
-      .populate("user")
-      .exec();
-    res.send(reviews);
-  } catch (error) {
-    return res.status(404).send("Invalid request");
+  const queryStringObj = { ...req.query };
+  const excludesFildes = ["page", "sort", "limit", "fields"];
+  excludesFildes.forEach((field) => delete queryStringObj[field]);
+  let queryStr = JSON.stringify(queryStringObj);
+  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+  const page = req.query.page * 1 || 1;
+  const limit = req.query.limit * 1 || 50;
+  const skip = (page - 1) * limit;
+  const endIndex = page * limit;
+  const pagination = {};
+  const documentCount = await Review.countDocuments();
+  pagination.currentPage = page;
+  pagination.limit = limit;
+  pagination.numberPages = Math.ceil(documentCount / limit);
+  //next page
+  if (endIndex < documentCount) {
+    pagination.nextPage = page + 1;
   }
+  if (skip > 0) {
+    pagination.prevPage = page - 1;
+  }
+  const paginationResult = pagination;
+  let mongooseQuery = Order.find(JSON.parse(queryStr))
+    .skip(skip)
+    .limit(limit)
+    .populate({
+      path: "cartItems",
+      populate: { path: " productId", model: "Product" },
+    }); //sorting
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    mongooseQuery = mongooseQuery.sort(sortBy);
+  } else {
+    mongooseQuery = mongooseQuery.sort("-createAt");
+  }
+  //fields
+  if (req.query.fields) {
+    const fields = req.query.fields.split(",").join(" ");
+    mongooseQuery = mongooseQuery.select(fields);
+  } else {
+    mongooseQuery.select("-__v");
+  }
+  //search
+  if (req.query.keyword) {
+    let query = {};
+    if (Order.modelName === "Product") {
+      query.$or = [
+        { title: { $regex: req.query.keyword, $options: "i" } },
+        { description: { $regex: req.query.keyword, $options: "i" } },
+      ];
+    } else {
+      query = { name: { $regex: req.query.keyword, $options: "i" } };
+    }
+    mongooseQuery = Review.find(query);
+  }
+  const Orders = await mongooseQuery;
+
+  // const page = req.query.page * 1 || 1;
+  // const limit = req.query.limit * 1 || 5;
+  // const skip = (page - 1) * limit;
+  const Reviews = await Review.find()
+    .populate("user")
+    .populate({
+      path: "cartItems",
+      populate: { path: " productId", model: "Product" },
+    });
+
+  res
+    .status(200)
+    .json({ results: Reviews.length, paginationResult, data: orders });
 };
 
 const addProductReviews = async (req, res) => {
   try {
     const { reviewDetails } = req.body;
     const user = req.user;
-    console.log(user);
-    //const email =req.headers["email"];
-    // const user= req.user;
-
-    //const user = await User.findOne({email: email});
-
     const { id } = req.params;
 
     if (!user || !reviewDetails) {
