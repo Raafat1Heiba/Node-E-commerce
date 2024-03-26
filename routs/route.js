@@ -4,14 +4,12 @@ const {
   createcategoryValidator,
   updatecategoryValidator,
   deletecategoryValidator,
-  // eslint-disable-next-line import/newline-after-import
 } = require("../utils/validators/categoryValidator");
 const router = express.Router();
 const main = require("../controlers/controller");
-// eslint-disable-next-line import/no-useless-path-segments, import/newline-after-import
-const subcategoryRoute = require("../routs/subCategoryRoute");
+const productRoute = require("../routs/productRoute");
 
-router.use("/:categoryId/subcategories", subcategoryRoute);
+router.use("/:categoryId/product", productRoute);
 router.get("/", main.get);
 router.get("/:id", getcategoryValidator, main.getId);
 router.post(

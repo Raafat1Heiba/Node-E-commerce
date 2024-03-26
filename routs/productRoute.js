@@ -4,12 +4,10 @@ const {
   createProductValidator,
   updateProductValidator,
   deleteProductValidator,
-  // eslint-disable-next-line import/newline-after-import
 } = require("../utils/validators/productValidator");
 const { isAdmin } = require("../midleWare/Admin");
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 const main = require("../controlers/productController");
-// eslint-disable-next-line import/no-useless-path-segments, import/newline-after-import
 router.get("/", main.get);
 router.get("/:id", getProductValidator, main.getId);
 router.post(

@@ -44,7 +44,10 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
   next();
 });
 exports.get = asyncHandler(async (req, res) => {
-  const queryStringObj = { ...req.query };
+  console.log(req.params.categoryId);
+  let filterObj = {};
+  if (req.params.categoryId) filterObj = { category: req.params.categoryId };
+  const queryStringObj = { ...req.query, ...filterObj };
   const excludesFildes = ["page", "sort", "limit", "fields"];
   excludesFildes.forEach((field) => delete queryStringObj[field]);
   let queryStr = JSON.stringify(queryStringObj);
