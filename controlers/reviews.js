@@ -1,5 +1,5 @@
 const Product = require('../models/productModel');
-const Review = require('../models/review.model');
+const Review = require('../models/reviewModel');
 const User = require('../models/userModel');
 
 // const getProductReviews = async (req, res) => {
