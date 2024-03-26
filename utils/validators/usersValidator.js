@@ -5,8 +5,13 @@ const validateNewUser = (user) => {
     name: joi.string().min(3).max(50).required(),
     email: joi
       .string()
-      .email({ tlds: { allow: false } })
+      .email({
+        tlds: {
+          allow: false
+        }
+      })
       .required(),
+    image: joi.string().max(255),
     password: joi.string().min(6).max(255).required(),
     isAdmin: joi.boolean(),
   });
@@ -15,7 +20,12 @@ const validateNewUser = (user) => {
 const validateUser = (user) => {
   const schema = joi.object({
     name: joi.string().min(3).max(50),
-    email: joi.string().email({ tlds: { allow: false } }),
+    email: joi.string().email({
+      tlds: {
+        allow: false
+      }
+    }),
+    image: joi.string().max(255),
     password: joi.string().min(6).max(255),
     isAdmin: joi.boolean(),
   });

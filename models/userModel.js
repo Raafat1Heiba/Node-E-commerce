@@ -30,6 +30,11 @@ const userSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  image: {
+    type: String,
+    default: "",
+    maxLength: 255,
+  }
 });
 const User = mongoose.model("User", userSchema);
 module.exports = User;

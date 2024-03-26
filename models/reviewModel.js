@@ -11,11 +11,11 @@ const reviewSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
-  prodcut: {
+  product: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Product",
-    required: true,
-  },
+    required: true
+}
 });
 
 const Review = mongoose.model("Review", reviewSchema); //make collection in database and and do the constrains of the schema on the object of the js

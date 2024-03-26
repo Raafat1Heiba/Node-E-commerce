@@ -55,7 +55,12 @@ exports.createCashOrder = asyncHandler(async (req, res, next) => {
 exports.getOne = asyncHandler(async (req, res, next) => {
   try {
     const id = req.params.id;
-    const order = await Order.findById(id);
+    const order = await Order.findById(id)
+      .populate("user")
+      .populate({
+        path: "cartItems",
+        populate: { path: " productId", model: "Product" },
+      });
     if (!order) {
       return next(new ApiError("order not found", 404));
       //return res.status(400).json({ msg: "Category not found" });
@@ -63,13 +68,11 @@ exports.getOne = asyncHandler(async (req, res, next) => {
     res.status(200).json({ data: order });
   } catch (error) {
     console.log(error.message);
-
     return next(new ApiError("order not found", 404));
   }
 });
 
 exports.getOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find();
   const queryStringObj = { ...req.query };
   const excludesFildes = ["page", "sort", "limit", "fields"];
   excludesFildes.forEach((field) => delete queryStringObj[field]);
@@ -126,6 +129,16 @@ exports.getOrders = asyncHandler(async (req, res) => {
     mongooseQuery = Order.find(query);
   }
   const Orders = await mongooseQuery;
+
+  // const page = req.query.page * 1 || 1;
+  // const limit = req.query.limit * 1 || 5;
+  // const skip = (page - 1) * limit;
+  const orders = await Order.find()
+    .populate("user")
+    .populate({
+      path: "cartItems",
+      populate: { path: " productId", model: "Product" },
+    });
 
   res
     .status(200)
@@ -220,14 +233,21 @@ exports.updateOrderStatus = asyncHandler(async (req, res, next) => {
     return next(new ApiError("Order Not Found", 404));
   }
   // update order to delvered
-  order.status = status;
-  const updatedOrder = await order.save();
+
+  const updatedOrder = await Order.updateOne(
+    { _id: req.params.id },
+    { status }
+  );
+
   res.status(200).json({ status: "success", data: updatedOrder });
 });
 exports.getUserOrders = asyncHandler(async (req, res, next) => {
   try {
     const id = req.params.id;
-    const orders = await Order.find({ user: id });
+    const orders = await Order.find({ user: id }).populate({
+      path: "cartItems",
+      populate: { path: " productId", model: "Product" },
+    });
     if (!orders) {
       return next(new ApiError("order not found", 404));
       //return res.status(400).json({ msg: "Category not found" });
@@ -242,7 +262,12 @@ exports.getUserOrders = asyncHandler(async (req, res, next) => {
 exports.getOrdersByStatus = asyncHandler(async (req, res, next) => {
   try {
     const status = req.params.status;
-    const orders = await Order.find({ status: status });
+    const orders = await Order.find({ status: status })
+      .populate("user")
+      .populate({
+        path: "cartItems",
+        populate: { path: " productId", model: "Product" },
+      });
     if (!orders) {
       return next(new ApiError("order not found", 404));
       //return res.status(400).json({ msg: "Category not found" });
