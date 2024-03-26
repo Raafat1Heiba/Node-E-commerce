@@ -61,7 +61,7 @@ const deleteProductReviews = async (req, res) => {
     }
     await review.deleteOne({ _id: id });
 
-    res.send("deleted");
+    res.json({ message: "deleted successfully!" });
   } catch (error) {
     res.status(404).send({ message: error.message });
   }

@@ -1,16 +1,52 @@
 const slugify = require("slugify");
 const product = require("../models/productModel");
 const ApiError = require("../utils/error");
-// eslint-disable-next-line import/order, import/newline-after-import
 const asyncHandler = require("express-async-handler");
+const multer = require("multer");
+const sharp = require("sharp");
+const { emit } = require("nodemon");
+const { v4: uuidv4 } = require("uuid");
 
+const multerStorage = multer.memoryStorage();
+const multerFilter = function (req, file, cb) {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new ApiError("only images", 400), false);
+  }
+};
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+exports.uploadProductImage = upload.fields([
+  {
+    name: "imageCover",
+    maxCount: 1,
+  },
+  {
+    name: "images",
+    maxCount: 5,
+  },
+]);
+exports.resizeImage = asyncHandler(async (req, res, next) => {
+  console.log(req.files);
+  if (!req.files.imageCover) {
+    return next(
+      new ApiError("No file uploaded or file buffer is missing", 400)
+    );
+  }
+  const filename = `product-${uuidv4()}-${Date.now()}-cover.jpeg`;
+  await sharp(req.files.imageCover[0].buffer)
+    .resize(2000, 1333)
+    .toFormat("jpeg")
+    .jpeg({ quality: 95 })
+    .toFile(`uploads/categories/${filename}`);
+  // // Save image into our db
+  req.body.imageCover = filename;
+  next();
+});
 exports.get = asyncHandler(async (req, res) => {
-  //filtering
-  // eslint-disable-next-line node/no-unsupported-features/es-syntax
   const queryStringObj = { ...req.query };
   const excludesFildes = ["page", "sort", "limit", "fields"];
   excludesFildes.forEach((field) => delete queryStringObj[field]);
-  //Apply filtration using [gte | gt | lte | lt]
   let queryStr = JSON.stringify(queryStringObj);
   queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
   //pagination
