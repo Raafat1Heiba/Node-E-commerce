@@ -25,13 +25,10 @@ const getProductReviews = async (req, res) => {
     pagination.prevPage = page - 1;
   }
   const paginationResult = pagination;
-  let mongooseQuery = Order.find(JSON.parse(queryStr))
+  let mongooseQuery = Review.find(JSON.parse(queryStr))
     .skip(skip)
     .limit(limit)
-    .populate({
-      path: "cartItems",
-      populate: { path: " productId", model: "Product" },
-    }); //sorting
+    .populate("user"); //sorting
   if (req.query.sort) {
     const sortBy = req.query.sort.split(",").join(" ");
     mongooseQuery = mongooseQuery.sort(sortBy);
@@ -58,21 +55,18 @@ const getProductReviews = async (req, res) => {
     }
     mongooseQuery = Review.find(query);
   }
-  const Orders = await mongooseQuery;
+  const reviews = await mongooseQuery;
 
   // const page = req.query.page * 1 || 1;
   // const limit = req.query.limit * 1 || 5;
   // const skip = (page - 1) * limit;
   const Reviews = await Review.find()
     .populate("user")
-    .populate({
-      path: "cartItems",
-      populate: { path: " productId", model: "Product" },
-    });
+  
 
   res
     .status(200)
-    .json({ results: Reviews.length, paginationResult, data: orders });
+    .json({ results: Reviews.length, paginationResult, data: reviews });
 };
 
 const addProductReviews = async (req, res) => {
