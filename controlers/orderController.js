@@ -118,7 +118,7 @@ exports.getOrders = asyncHandler(async (req, res) => {
   //search
   if (req.query.keyword) {
     let query = {};
-    if (Order.modelName === "Product") {
+    if (Order.modelName === "Order") {
       query.$or = [
         { title: { $regex: req.query.keyword, $options: "i" } },
         { description: { $regex: req.query.keyword, $options: "i" } },

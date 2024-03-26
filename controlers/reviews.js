@@ -3,11 +3,14 @@ const Review = require("../models/reviewModel");
 const User = require("../models/userModel");
 
 const getProductReviews = async (req, res) => {
-  const queryStringObj = { ...req.query };
+  const queryStringObj = { ...req.query , product : req.params.id};
+  console.log(queryStringObj)
+  console.log(req.params.id)
   const excludesFildes = ["page", "sort", "limit", "fields"];
   excludesFildes.forEach((field) => delete queryStringObj[field]);
   let queryStr = JSON.stringify(queryStringObj);
   queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+  console.log(queryStr)
   const page = req.query.page * 1 || 1;
   const limit = req.query.limit * 1 || 50;
   const skip = (page - 1) * limit;
@@ -29,6 +32,7 @@ const getProductReviews = async (req, res) => {
     .skip(skip)
     .limit(limit)
     .populate("user"); //sorting
+    //console.log(mongooseQuery)
   if (req.query.sort) {
     const sortBy = req.query.sort.split(",").join(" ");
     mongooseQuery = mongooseQuery.sort(sortBy);
@@ -45,7 +49,7 @@ const getProductReviews = async (req, res) => {
   //search
   if (req.query.keyword) {
     let query = {};
-    if (Order.modelName === "Product") {
+    if (Review.modelName === "Review") {
       query.$or = [
         { title: { $regex: req.query.keyword, $options: "i" } },
         { description: { $regex: req.query.keyword, $options: "i" } },
@@ -60,13 +64,13 @@ const getProductReviews = async (req, res) => {
   // const page = req.query.page * 1 || 1;
   // const limit = req.query.limit * 1 || 5;
   // const skip = (page - 1) * limit;
-  const Reviews = await Review.find()
-    .populate("user")
+  // const Reviews = await Review.find()
+  //   .populate("user")
   
 
   res
     .status(200)
-    .json({ results: Reviews.length, paginationResult, data: reviews });
+    .json({ results: reviews.length, paginationResult, data: reviews });
 };
 
 const addProductReviews = async (req, res) => {
