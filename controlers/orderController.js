@@ -63,7 +63,6 @@ exports.getOne = asyncHandler(async (req, res, next) => {
     res.status(200).json({ data: order });
   } catch (error) {
     console.log(error.message);
-
     return next(new ApiError("order not found", 404));
   }
 });
@@ -165,8 +164,9 @@ exports.updateOrderStatus = asyncHandler(async (req, res, next) => {
     return next(new ApiError("Order Not Found", 404));
   }
   // update order to delvered
-  order.status = status;
-  const updatedOrder = await order.save();
+ 
+  const updatedOrder = await Order.updateOne({_id:req.params.id},{status});
+
   res.status(200).json({ status: "success", data: updatedOrder });
 });
 exports.getUserOrders = asyncHandler(async (req, res, next) => {
