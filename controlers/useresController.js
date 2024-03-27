@@ -1,3 +1,6 @@
+const multer = require("multer");
+const sharp = require("sharp");
+const { v4: uuidv4 } = require("uuid");
 const { createNewUser, findUserByEmail, findAllUsers } = require("../services/userService");
 // const { validateNewUser } = require("../validation/users.validator");
 // const bcrypt = require('bcrypt');
@@ -7,6 +10,8 @@ const { validateNewUser } = require("../utils/validators/usersValidator");
 const bcrypt = require("bcrypt");
 // eslint-disable-next-line import/no-extraneous-dependencies, import/order
 const jwt = require("jsonwebtoken");
+const asyncHandler = require("express-async-handler");
+
 
 
 const getAllUsers = async (req,res)=>{
@@ -22,6 +27,31 @@ const getAllUsers = async (req,res)=>{
 //        }
 //         res.send(user);
 // }
+
+
+
+const multerStorage = multer.memoryStorage();
+const multerFilter = function (req, file, cb) {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new ApiError("only images", 400), false);
+  }
+};
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+const uploadUserImage = upload.single("image");
+const resizeImage = asyncHandler(async (req, res, next) => {
+  const filename = `user-${uuidv4()}-${Date.now()}.jpeg`;
+
+  await sharp(req.file.buffer)
+    .resize(600, 600)
+    .toFormat("jpeg")
+    .jpeg({ quality: 95 })
+    .toFile(`uploads/users/${filename}`);
+
+  req.body.image = filename;
+  next();
+});
 
 
 const createUser= async(req,res)=>{
@@ -92,5 +122,7 @@ const login= async(req, res)=>{
 module.exports={
     createUser,
     login,
-    getAllUsers
+    getAllUsers,
+    uploadUserImage,
+    resizeImage
 }

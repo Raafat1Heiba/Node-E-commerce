@@ -33,6 +33,8 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
 
   next();
 });
+
+
 exports.get = asyncHandler(async (req, res) => {
   // eslint-disable-next-line node/no-unsupported-features/es-syntax
   const queryStringObj = { ...req.query };
@@ -91,6 +93,8 @@ exports.get = asyncHandler(async (req, res) => {
     .status(200)
     .json({ results: categories.length, paginationResult, data: categories });
 });
+
+
 exports.getId = asyncHandler(async (req, res, next) => {
   // eslint-disable-next-line prefer-destructuring
   const id = req.params.id;
