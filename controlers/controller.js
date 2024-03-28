@@ -27,6 +27,8 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
   req.body.image = filename;
   next();
 });
+
+
 exports.get = asyncHandler(async (req, res) => {
   const queryStringObj = { ...req.query };
   const excludesFildes = ["page", "sort", "limit", "fields"];
@@ -84,6 +86,8 @@ exports.get = asyncHandler(async (req, res) => {
     .status(200)
     .json({ results: categories.length, paginationResult, data: categories });
 });
+
+
 exports.getId = asyncHandler(async (req, res, next) => {
   // eslint-disable-next-line prefer-destructuring
   const id = req.params.id;

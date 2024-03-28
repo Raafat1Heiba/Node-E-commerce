@@ -24,6 +24,8 @@ const orderRoute = require("./routs/orderRoute");
 const productsRoute = require("./routs/productRoute");
 const reviewRoutes = require("./routs/reviewRoute");
 const userProfileRoutes = require("./routs/userProfileRoute");
+// eslint-disable-next-line import/no-useless-path-segments
+
 const userRouter = require("./routs/usersRoute");
 const shoppingCartRouter = require("./routs/shoppingRoute");
 // const mongoose = require("mongoose");

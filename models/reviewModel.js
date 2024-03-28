@@ -15,7 +15,12 @@ const reviewSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Product",
     required: true
-}
+},
+  rating:{
+    type:Number,
+    min:0,
+    max:5
+  }
 });
 
 const Review = mongoose.model("Review", reviewSchema); //make collection in database and and do the constrains of the schema on the object of the js
