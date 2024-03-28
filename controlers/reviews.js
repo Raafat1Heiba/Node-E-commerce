@@ -3,20 +3,20 @@ const Review = require("../models/reviewModel");
 const User = require("../models/userModel");
 
 const getProductReviews = async (req, res) => {
-  const queryStringObj = { ...req.query , product : req.params.id};
-  console.log(queryStringObj)
-  console.log(req.params.id)
+  const queryStringObj = { ...req.query, product: req.params.id };
+  console.log(queryStringObj);
+  console.log(req.params.id);
   const excludesFildes = ["page", "sort", "limit", "fields"];
   excludesFildes.forEach((field) => delete queryStringObj[field]);
   let queryStr = JSON.stringify(queryStringObj);
   queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-  console.log(queryStr)
+  console.log(queryStr);
   const page = req.query.page * 1 || 1;
   const limit = req.query.limit * 1 || 50;
   const skip = (page - 1) * limit;
   const endIndex = page * limit;
   const pagination = {};
-  const documentCount = await Review.countDocuments();
+  const documentCount = await Review.countDocuments({ product: req.params.id });
   pagination.currentPage = page;
   pagination.limit = limit;
   pagination.numberPages = Math.ceil(documentCount / limit);
@@ -32,7 +32,7 @@ const getProductReviews = async (req, res) => {
     .skip(skip)
     .limit(limit)
     .populate("user"); //sorting
-    //console.log(mongooseQuery)
+  //console.log(mongooseQuery)
   if (req.query.sort) {
     const sortBy = req.query.sort.split(",").join(" ");
     mongooseQuery = mongooseQuery.sort(sortBy);
@@ -66,7 +66,6 @@ const getProductReviews = async (req, res) => {
   // const skip = (page - 1) * limit;
   // const Reviews = await Review.find()
   //   .populate("user")
-  
 
   res
     .status(200)
@@ -94,9 +93,9 @@ const addProductReviews = async (req, res) => {
       return;
     }
 
-    if(rating){
+    if (rating) {
       const oldRating = product.ratingsAverage;
-      const oldQuantity= product.ratingsQuantity
+      const oldQuantity = product.ratingsQuantity;
       if (!oldRating) {
         await Product.updateOne(
           {
@@ -105,7 +104,7 @@ const addProductReviews = async (req, res) => {
           {
             $set: {
               ratingsAverage: rating,
-              ratingsQuantity:1
+              ratingsQuantity: 1,
             },
           }
         );
@@ -118,7 +117,7 @@ const addProductReviews = async (req, res) => {
           {
             $set: {
               ratingsAverage: newRating,
-              ratingsQuantity:oldQuantity + 1
+              ratingsQuantity: oldQuantity + 1,
             },
           }
         );
@@ -129,7 +128,7 @@ const addProductReviews = async (req, res) => {
       reviewDetails: reviewDetails,
       user: user.id,
       product: id,
-      rating
+      rating,
     });
     res.send(review);
   } catch (error) {
@@ -181,7 +180,7 @@ const deleteProductReviews = async (req, res) => {
 const editProductReviews = async (req, res) => {
   try {
     //const email =req.headers["email"];
-    const { reviewDetails ,rating} = req.body;
+    const { reviewDetails, rating } = req.body;
     const user = req.user;
 
     //const user = await User.findOne({email: email});
