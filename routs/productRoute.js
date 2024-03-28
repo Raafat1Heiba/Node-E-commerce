@@ -19,8 +19,8 @@ router.post(
 );
 router.put(
   "/:id",
-  main.uploadProductImage,
-  main.resizeImage,
+  // main.uploadProductImage,
+  // main.resizeImage,
   updateProductValidator,
   main.update
 );

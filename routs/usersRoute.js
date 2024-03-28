@@ -8,8 +8,8 @@ const router = express.Router();
 
 router.post(
   "/register",
-  main.resizeImage,
-  main.uploadUserImage,
+  // main.resizeImage,
+  // main.uploadUserImage,
   main.createUser
 );
 

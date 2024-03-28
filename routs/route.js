@@ -16,15 +16,15 @@ router.get("/", main.get);
 router.get("/:id", getcategoryValidator, main.getId);
 router.post(
   "/",
-  main.uploadCategoryImage,
-  main.resizeImage,
+  // main.uploadCategoryImage,
+  // main.resizeImage,
   createcategoryValidator,
   main.create
 );
 router.put(
   "/:id",
-  main.uploadCategoryImage,
-  main.resizeImage,
+  // main.uploadCategoryImage,
+  // main.resizeImage,
   updatecategoryValidator,
   main.update
 );
