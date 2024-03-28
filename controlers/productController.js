@@ -68,7 +68,13 @@ exports.get = asyncHandler(async (req, res) => {
   const skip = (page - 1) * limit;
   const endIndex = page * limit;
   const pagination = {};
-  const documentCount = await product.countDocuments();
+  let documentCount;
+
+  if (req.params.categoryId) {
+    documentCount = await product.countDocuments(filterObj);
+  } else {
+    documentCount = await product.countDocuments();
+  }
   pagination.currentPage = page;
   pagination.limit = limit;
   pagination.numberPages = Math.ceil(documentCount / limit);
