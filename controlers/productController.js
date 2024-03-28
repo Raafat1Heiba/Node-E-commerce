@@ -151,11 +151,11 @@ exports.update = asyncHandler(async (req, res, next) => {
 });
 exports.delete = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  const products = await product.findOneAndDelete(id);
+  const products = await product.deleteOne({_id:id});
   if (!products) {
     return next(new ApiError("products not found", 404));
   }
-  res.status(200).send();
+  res.status(200).send({message:"deleted",products});
 });
 exports.create = asyncHandler(async (req, res) => {
   req.body.slug = slugify(req.body.title);
