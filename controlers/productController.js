@@ -27,24 +27,34 @@ exports.uploadProductImage = upload.fields([
   },
 ]);
 exports.resizeImage = asyncHandler(async (req, res, next) => {
-  console.log(req.files);
-  if (!req.files.imageCover) {
-    return next(
-      new ApiError("No file uploaded or file buffer is missing", 400)
-    );
+  if (req.files.imageCover) {
+    const filename = `product-${uuidv4()}-${Date.now()}-cover.jpeg`;
+
+    await sharp(req.files.imageCover[0].buffer)
+      .resize(2000, 1333)
+      .toFormat("jpeg")
+      .jpeg({ quality: 95 })
+      .toFile(`uploads/categories/${filename}`);
+    req.body.imageCover = filename;
   }
-  const filename = `product-${uuidv4()}-${Date.now()}-cover.jpeg`;
-  await sharp(req.files.imageCover[0].buffer)
-    .resize(2000, 1333)
-    .toFormat("jpeg")
-    .jpeg({ quality: 95 })
-    .toFile(`uploads/categories/${filename}`);
-  // // Save image into our db
-  req.body.imageCover = filename;
-  next();
+  if (req.files.images) {
+    req.body.images = [];
+    await Promise.all(
+      req.files.images.map(async (img, index) => {
+        const imageName = `product-${uuidv4()}-${Date.now()}-${index + 1}.jpeg`;
+
+        await sharp(img.buffer)
+          .resize(2000, 1333)
+          .toFormat("jpeg")
+          .jpeg({ quality: 95 })
+          .toFile(`uploads/categories/${imageName}`);
+        req.body.images.push(imageName);
+      })
+    );
+    next();
+  }
 });
 exports.get = asyncHandler(async (req, res) => {
-  console.log(req.params.categoryId);
   let filterObj = {};
   if (req.params.categoryId) filterObj = { category: req.params.categoryId };
   const queryStringObj = { ...req.query, ...filterObj };
@@ -110,14 +120,12 @@ exports.get = asyncHandler(async (req, res) => {
     .json({ results: products.length, paginationResult, data: products });
 });
 exports.getId = asyncHandler(async (req, res, next) => {
-  // eslint-disable-next-line prefer-destructuring
   const id = req.params.id;
   const products = await product
     .findById(id)
     .populate({ path: "category", select: "name" });
   if (!products) {
     return next(new ApiError("products not found", 404));
-    //  return res.status(400).json({ msg: "Category not found" });
   }
   res.status(200).json({ data: products });
 });
@@ -133,7 +141,6 @@ exports.update = asyncHandler(async (req, res, next) => {
   if (!products) {
     return next(new ApiError("products not found", 404));
   }
-  // return res.status(400).json({ msg: "Category not found" });
   res.status(200).json(products);
 });
 exports.delete = asyncHandler(async (req, res, next) => {
@@ -142,7 +149,6 @@ exports.delete = asyncHandler(async (req, res, next) => {
   if (!products) {
     return next(new ApiError("products not found", 404));
   }
-  // return res.status(400).json({ msg: "Category not found" });
   res.status(200).send();
 });
 exports.create = asyncHandler(async (req, res) => {

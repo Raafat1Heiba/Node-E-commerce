@@ -1,12 +1,8 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 const multer = require("multer");
-// eslint-disable-next-line import/no-extraneous-dependencies
 const sharp = require("sharp");
-// eslint-disable-next-line import/no-extraneous-dependencies
 const { v4: uuidv4 } = require("uuid");
 const categoryModel = require("../models/categoryModel");
 const ApiError = require("../utils/error");
-// eslint-disable-next-line import/order, import/newline-after-import
 const asyncHandler = require("express-async-handler");
 
 const multerStorage = multer.memoryStorage();
@@ -28,13 +24,10 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
     .jpeg({ quality: 95 })
     .toFile(`uploads/categories/${filename}`);
 
-  // // Save image into our db
   req.body.image = filename;
-
   next();
 });
 exports.get = asyncHandler(async (req, res) => {
-  // eslint-disable-next-line node/no-unsupported-features/es-syntax
   const queryStringObj = { ...req.query };
   const excludesFildes = ["page", "sort", "limit", "fields"];
   excludesFildes.forEach((field) => delete queryStringObj[field]);

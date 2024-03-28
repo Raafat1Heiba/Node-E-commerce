@@ -33,8 +33,9 @@ exports.createFilter = (req, res, next) => {
   next();
 };
 exports.getSubCategory = asyncHandler(async (req, res) => {
-  // eslint-disable-next-line node/no-unsupported-features/es-syntax
-  const queryStringObj = { ...req.query };
+  let filterObj = {};
+  if (req.params.categoryId) filterObj = { category: req.params.categoryId };
+  const queryStringObj = { ...req.query, ...filterObj };
   const excludesFildes = ["page", "sort", "limit", "fields"];
   excludesFildes.forEach((field) => delete queryStringObj[field]);
   //Apply filtration using [gte | gt | lte | lt]

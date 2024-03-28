@@ -8,8 +8,10 @@ const {
 const router = express.Router();
 const main = require("../controlers/controller");
 const productRoute = require("../routs/productRoute");
+const subCategoryRoute = require("../routs/subCategoryRoute");
 
 router.use("/:categoryId/product", productRoute);
+router.use("/:categoryId/subcategory", subCategoryRoute);
 router.get("/", main.get);
 router.get("/:id", getcategoryValidator, main.getId);
 router.post(

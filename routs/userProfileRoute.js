@@ -6,7 +6,18 @@ const controllers = require("../controlers/userProfileController");
 const { auth } = require("../midleWare/auth");
 //const { isAdmin } = require("../middleware/admin");
 
-router.get("/", auth, controllers.getCurrentUserProfile);
-router.patch("/", auth, controllers.updateCurrentUserProfile);
+router.get(
+  "/",
+  auth,
+
+  controllers.getCurrentUserProfile
+);
+router.patch(
+  "/",
+  auth,
+  controllers.resizeImage,
+  controllers.uploadUserImage,
+  controllers.updateCurrentUserProfile
+);
 
 module.exports = router;

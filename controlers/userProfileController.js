@@ -1,17 +1,37 @@
 const User = require("../models/userModel");
 const { findUserByEmail } = require("../services/userService");
-// eslint-disable-next-line import/no-extraneous-dependencies, import/order
 const bcrypt = require("bcrypt");
 const { validateUser } = require("../utils/validators/usersValidator");
+const asyncHandler = require("express-async-handler");
+const multer = require("multer");
+const sharp = require("sharp");
+const { v4: uuidv4 } = require("uuid");
+
+const multerStorage = multer.memoryStorage();
+const multerFilter = function (req, file, cb) {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new ApiError("only images", 400), false);
+  }
+};
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+const uploadUserImage = upload.single("image");
+const resizeImage = asyncHandler(async (req, res, next) => {
+  const filename = ` user-${uuidv4()}-${Date.now()}.jpeg`;
+
+  await sharp(req.file.buffer)
+    .resize(600, 600)
+    .toFormat("jpeg")
+    .jpeg({ quality: 95 })
+    .toFile(`uploads/users/${filename}`);
+
+  req.body.image = filename;
+  next();
+});
 
 const getCurrentUserProfile = async (req, res) => {
   try {
-    // const  email = req.headers.email;
-
-    // if(!email){
-    //     return res.status(404).send("current user email is required!");
-    // }
-    // eslint-disable-next-line prefer-destructuring
     const user = req.user;
     if (!user) {
       return res.status(404).send("incorrect email");
@@ -19,7 +39,6 @@ const getCurrentUserProfile = async (req, res) => {
 
     res.send(user);
   } catch (error) {
-    //return res.status(404).send("Invalid request");
     console.log(error.message);
   }
 };
@@ -31,9 +50,7 @@ const updateCurrentUserProfile = async (req, res) => {
       res.status(400).send({ message: "Invalid form field.." });
       return;
     }
-    // const  email  = req.headers["email"];
 
-    // eslint-disable-next-line prefer-destructuring
     const user = req.user;
     if (!user) {
       return res.status(404).send("incorrect email");
@@ -48,9 +65,7 @@ const updateCurrentUserProfile = async (req, res) => {
     const updatedUser = await findUserByEmail(user.email);
     res.send(updatedUser);
   } catch (error) {
-    // eslint-disable-next-line prefer-template
     res.status(404).send("Invalid request" + error.message);
-    // eslint-disable-next-line no-useless-return
     return;
   }
 };
@@ -58,4 +73,6 @@ const updateCurrentUserProfile = async (req, res) => {
 module.exports = {
   getCurrentUserProfile,
   updateCurrentUserProfile,
+  uploadUserImage,
+  resizeImage,
 };
