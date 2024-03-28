@@ -75,7 +75,7 @@ const getProductReviews = async (req, res) => {
 
 const addProductReviews = async (req, res) => {
   try {
-    const { reviewDetails } = req.body;
+    const { reviewDetails, rating } = req.body;
     const user = req.user;
     const { id } = req.params;
 
@@ -93,10 +93,43 @@ const addProductReviews = async (req, res) => {
       res.status(422).send("invalid");
       return;
     }
+
+    if(rating){
+      const oldRating = product.ratingsAverage;
+      const oldQuantity= product.ratingsQuantity
+      if (!oldRating) {
+        await Product.updateOne(
+          {
+            _id: id,
+          },
+          {
+            $set: {
+              ratingsAverage: rating,
+              ratingsQuantity:1
+            },
+          }
+        );
+      } else {
+        const newRating = (oldRating + rating) / 2;
+        await Product.updateOne(
+          {
+            _id: id,
+          },
+          {
+            $set: {
+              ratingsAverage: newRating,
+              ratingsQuantity:oldQuantity + 1
+            },
+          }
+        );
+      }
+    }
+
     const review = await Review.create({
       reviewDetails: reviewDetails,
       user: user.id,
       product: id,
+      rating
     });
     res.send(review);
   } catch (error) {
@@ -148,7 +181,7 @@ const deleteProductReviews = async (req, res) => {
 const editProductReviews = async (req, res) => {
   try {
     //const email =req.headers["email"];
-    const { reviewDetails } = req.body;
+    const { reviewDetails ,rating} = req.body;
     const user = req.user;
 
     //const user = await User.findOne({email: email});
