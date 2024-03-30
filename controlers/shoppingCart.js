@@ -148,12 +148,12 @@ const deleteProductInShoppingCart = async (req, res) => {
 
     const user = req.user;
     const { productId } = req.params;
-    const userCart = await findCurrentUserShoppingCart(user.id);
+    let userCart = await findCurrentUserShoppingCart(user.id);
     if (!userCart) {
       res.status(404).json("The cart for the current user was not found");
       return;
     }
-    const itemIndex = userCart.items.find((item) =>
+    const itemIndex = userCart.items.findIndex((item) =>
       item.productId.equals(productId)
     );
     if (!itemIndex) {
@@ -162,7 +162,14 @@ const deleteProductInShoppingCart = async (req, res) => {
         .json("The item with the given ID was not found in the cart");
       return;
     }
-    userCart.items.splice(itemIndex, 1);
+    userCart.items=userCart.items.filter((item) =>
+    !item.productId.equals(productId)
+  );
+  // const cart = await ShoppingCart.findOneAndUpdate(
+  //   { user: req.user._id },
+  //   { $pull: { cartItemSchema: { _id: req.params.itemId } } },
+  //   { new: true }
+  // );
 
     let totalPrice = 0;
     userCart.items.forEach((item) => {
@@ -172,7 +179,7 @@ const deleteProductInShoppingCart = async (req, res) => {
     await userCart.save();
     res.json({ message: "Item deleted from cart successfully", userCart });
   } catch (error) {
-    res.status(500).json({ error: "Error deleting product quantity" });
+    res.status(500).json({err:error.message});
   }
 };
 
