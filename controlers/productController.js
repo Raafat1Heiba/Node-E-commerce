@@ -6,6 +6,7 @@ const multer = require("multer");
 const sharp = require("sharp");
 const { emit } = require("nodemon");
 const { v4: uuidv4 } = require("uuid");
+const { json } = require("express");
 
 const multerStorage = multer.memoryStorage();
 const multerFilter = function (req, file, cb) {
@@ -59,7 +60,7 @@ exports.get = asyncHandler(async (req, res) => {
   if (req.params.categoryId) filterObj = { category: req.params.categoryId };
   const queryStringObj = { ...req.query, ...filterObj };
   //console.log(queryStringObj)
-  const excludesFildes = ["page", "sort", "limit", "fields"];
+  const excludesFildes = ["page", "sort", "limit", "fields","keyword"];
   excludesFildes.forEach((field) => delete queryStringObj[field]);
   let queryStr = JSON.stringify(queryStringObj);
   //console.log(queryStr)
@@ -90,7 +91,12 @@ exports.get = asyncHandler(async (req, res) => {
     //console.log(queryStr)
     if (req.params.categoryId) {
       query = {...query,...filterObj};
+    console.log(query,"1")
+
     }
+    const parsed=JSON.parse(queryStr)
+    query={...query, ...parsed}
+    console.log(query)
 
   //build query
   let mongooseQuery = product
@@ -138,9 +144,10 @@ exports.get = asyncHandler(async (req, res) => {
   if (skip > 0) {
     pagination.prevPage = page - 1;
   }
+  const paginationResult=pagination;
   res
     .status(200)
-    .json({ results: products.length, pagination, data: products });
+    .json({ results: products.length, paginationResult, data: products });
 });
 exports.getId = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
