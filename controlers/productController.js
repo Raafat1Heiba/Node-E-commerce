@@ -58,40 +58,52 @@ exports.get = asyncHandler(async (req, res) => {
   let filterObj = {};
   if (req.params.categoryId) filterObj = { category: req.params.categoryId };
   const queryStringObj = { ...req.query, ...filterObj };
+  //console.log(queryStringObj)
   const excludesFildes = ["page", "sort", "limit", "fields"];
   excludesFildes.forEach((field) => delete queryStringObj[field]);
   let queryStr = JSON.stringify(queryStringObj);
+  //console.log(queryStr)
   queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-  //pagination
+  //console.log(queryStr)
+
   const page = req.query.page * 1 || 1;
   const limit = req.query.limit * 1 || 50;
   const skip = (page - 1) * limit;
   const endIndex = page * limit;
   const pagination = {};
   let documentCount;
+  
+  let query = {};
+    //search
+    if (req.query.keyword) {
+      
+      if (product.modelName === "Product") {
+        query.$or = [
+          { title: { $regex: req.query.keyword, $options: "i" } },
+          { description: { $regex: req.query.keyword, $options: "i" } },
 
-  if (req.params.categoryId) {
-    documentCount = await product.countDocuments(filterObj);
-  } else {
-    documentCount = await product.countDocuments();
-  }
-  pagination.currentPage = page;
-  pagination.limit = limit;
-  pagination.numberPages = Math.ceil(documentCount / limit);
-  //next page
-  if (endIndex < documentCount) {
-    pagination.nextPage = page + 1;
-  }
-  if (skip > 0) {
-    pagination.prevPage = page - 1;
-  }
-  const paginationResult = pagination;
+        ];
+      } else {
+        query = { title: { $regex: req.query.keyword, $options: "i" } };
+      }
+    }
+    //console.log(queryStr)
+    if (req.params.categoryId) {
+      query = {...query,...filterObj};
+    }
+
   //build query
   let mongooseQuery = product
-    .find(JSON.parse(queryStr))
+    .find(query)
+  let fliterdProducts= await mongooseQuery;
+
+  mongooseQuery = product
+  .find(query)
     .skip(skip)
     .limit(limit)
     .populate({ path: "category", select: "name" });
+
+    
   //sorting
   if (req.query.sort) {
     const sortBy = req.query.sort.split(",").join(" ");
@@ -106,24 +118,29 @@ exports.get = asyncHandler(async (req, res) => {
   } else {
     mongooseQuery.select("-__v");
   }
-  //search
-  if (req.query.keyword) {
-    let query = {};
-    if (product.modelName === "Product") {
-      query.$or = [
-        { title: { $regex: req.query.keyword, $options: "i" } },
-        { description: { $regex: req.query.keyword, $options: "i" } },
-      ];
-    } else {
-      query = { name: { $regex: req.query.keyword, $options: "i" } };
-    }
-    mongooseQuery = product.find(query);
-  }
+
   //excute
   const products = await mongooseQuery;
+  //console.log(products.length)
+
+  //pagination
+
+
+  documentCount = fliterdProducts.length  
+
+  pagination.currentPage = page;
+  pagination.limit = limit;
+  pagination.numberPages = Math.ceil(documentCount / limit);
+  //next page
+  if (endIndex < documentCount) {
+    pagination.nextPage = page + 1;
+  }
+  if (skip > 0) {
+    pagination.prevPage = page - 1;
+  }
   res
     .status(200)
-    .json({ results: products.length, paginationResult, data: products });
+    .json({ results: products.length, pagination, data: products });
 });
 exports.getId = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
