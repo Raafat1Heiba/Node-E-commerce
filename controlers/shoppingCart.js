@@ -113,6 +113,9 @@ const updatProductInShoppingCart = async (req, res) => {
     const itemToUpdate = userCart.items.find((item) =>
       item.productId.equals(productId)
     );
+    const itemIndex = userCart.items.findIndex((item) =>
+    item.productId.equals(productId)
+  );
 
     if (!itemToUpdate) {
       res
@@ -126,6 +129,7 @@ const updatProductInShoppingCart = async (req, res) => {
       itemToUpdate.quantity = quantity;
     }
     let totalPrice = 0;
+    userCart.items[itemIndex]=itemToUpdate;
     userCart.items.forEach((item) => {
       totalPrice += item.productId.price * item.quantity;
     });
