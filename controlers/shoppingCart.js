@@ -25,7 +25,7 @@ const getCurrentUserShoppingCart = async (req, res) => {
 const addBProductsToshoppingCart = async (req, res) => {
   try {
     let { productId, quantity } = req.body;
-    console.log(quantity);
+    //console.log(quantity);
     // const  email = req.headers.email;
     // const findUser = await findUserByEmail(email)
     // const user= findUser._id
@@ -164,10 +164,14 @@ const deleteProductInShoppingCart = async (req, res) => {
       res.status(404).json("The cart for the current user was not found");
       return;
     }
-    const itemIndex = userCart.items.findIndex((item) =>
-      item.productId.equals(productId)
+    const itemIndex = userCart.items.findIndex((item) =>{
+      return item.productId._id.toString()===(productId)
+
+    }
     );
-    if (!itemIndex) {
+    console.log(itemIndex)
+
+    if (itemIndex==-1) {
       res
         .status(404)
         .json("The item with the given ID was not found in the cart");
@@ -184,6 +188,7 @@ const deleteProductInShoppingCart = async (req, res) => {
 
     let totalPrice = 0;
     userCart.items.forEach((item) => {
+      //console.log(item)
       totalPrice += item.productId.price * item.quantity;
     });
     userCart.price = totalPrice;
