@@ -6,6 +6,7 @@ const ShoppingCart = require("../models/shoppingModel");
 const User = require("../models/userModel");
 const { findUserByEmail } = require("../services/userService");
 const { findProductById } = require("../services/productService");
+const asyncHandler = require("express-async-handler");
 
 const getCurrentUserShoppingCart = async (req, res) => {
   try {
@@ -96,7 +97,7 @@ const addBProductsToshoppingCart = async (req, res) => {
   }
 };
 
-const updatProductInShoppingCart = async (req, res) => {
+const updatProductInShoppingCart = asyncHandler(async (req, res,next) => {
   try {
     // const  email = req.headers.email;
     // const findUser = await findUserByEmail(email)
@@ -125,6 +126,8 @@ const updatProductInShoppingCart = async (req, res) => {
     }
     if (quantity > itemToUpdate.productId.quantity) {
       itemToUpdate.quantity = itemToUpdate.productId.quantity;
+      
+
     } else {
       itemToUpdate.quantity = quantity;
     }
@@ -136,6 +139,10 @@ const updatProductInShoppingCart = async (req, res) => {
     userCart.price = totalPrice;
 
     await userCart.save();
+    const updated=userCart
+
+    await ShoppingCart.findOneAndUpdate({_id:userCart._id},updated, {new:true})
+
 
     res.json({ message: "Product quantity updated successfully", userCart });
   } catch (error) {
@@ -143,7 +150,7 @@ const updatProductInShoppingCart = async (req, res) => {
       .status(500)
       .json({ error: "Error updating product quantity" + error.message });
   }
-};
+});
 const deleteProductInShoppingCart = async (req, res) => {
   try {
     // const  email = req.headers.email;
