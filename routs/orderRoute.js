@@ -29,7 +29,7 @@ router.put(
   // authService.allowTo("admin", "manager"),
   updateOrderTodelevred
 );
-router.get(
+router.post(
   "checkout-session/:cartId",
   // authService.allowTo(),
   checkOut
