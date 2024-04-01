@@ -29,9 +29,9 @@ const orderSchema = new mongoose.Schema(
       phone: String,
       city: String,
       postalCode: String,
-      country:string,
-      fullName:string,
-      streetAdress:string
+      country:String,
+      fullName:String,
+      streetAdress:String
     },
     shiippingPrice: {
       type: Number,
