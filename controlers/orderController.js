@@ -5,9 +5,7 @@ const Cart = require("../models/shoppingModel");
 const User = require("../models/userModel");
 const Product = require("../models/productModel");
 const { config } = require("dotenv");
-const stripe = require("stripe")(
-  sk_test_51OnQZAKIG07g9B4OctDoeQ9DVpDCddUwKigshgBDxGHpxVWM89mr2S4mjfAba0f37Egr4M6Rnp5MtjpzOV9JVOmW00zbevruF7
-);
+const stripe = require("stripe")();
 
 exports.createCashOrder = asyncHandler(async (req, res, next) => {
   try {
