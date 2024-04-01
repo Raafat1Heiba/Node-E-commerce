@@ -7,7 +7,6 @@ const User = require("../models/userModel");
 const { findUserByEmail } = require("../services/userService");
 const { findProductById } = require("../services/productService");
 const asyncHandler = require("express-async-handler");
-const { findByIdAndUpdate } = require("../models/productModel");
 
 const getCurrentUserShoppingCart = async (req, res) => {
   try {
@@ -26,7 +25,10 @@ const getCurrentUserShoppingCart = async (req, res) => {
 const addBProductsToshoppingCart = async (req, res) => {
   try {
     let { productId, quantity } = req.body;
-    console.log(quantity);
+    //console.log(quantity);
+    // const  email = req.headers.email;
+    // const findUser = await findUserByEmail(email)
+    // const user= findUser._id
     let mess = "";
     const user = req.user;
     let userCart = await findCurrentUserShoppingCart(user.id);
@@ -95,7 +97,7 @@ const addBProductsToshoppingCart = async (req, res) => {
   }
 };
 
-const updatProductInShoppingCart = async (req, res) => {
+const updatProductInShoppingCart = asyncHandler(async (req, res, next) => {
   try {
     // const  email = req.headers.email;
     // const findUser = await findUserByEmail(email)
@@ -112,6 +114,9 @@ const updatProductInShoppingCart = async (req, res) => {
     const itemToUpdate = userCart.items.find((item) =>
       item.productId.equals(productId)
     );
+    const itemIndex = userCart.items.findIndex((item) =>
+      item.productId.equals(productId)
+    );
 
     if (!itemToUpdate) {
       res
@@ -125,12 +130,18 @@ const updatProductInShoppingCart = async (req, res) => {
       itemToUpdate.quantity = quantity;
     }
     let totalPrice = 0;
+    userCart.items[itemIndex] = itemToUpdate;
     userCart.items.forEach((item) => {
       totalPrice += item.productId.price * item.quantity;
     });
     userCart.price = totalPrice;
 
     await userCart.save();
+    const updated = userCart;
+
+    await ShoppingCart.findOneAndUpdate({ _id: userCart._id }, updated, {
+      new: true,
+    });
 
     res.json({ message: "Product quantity updated successfully", userCart });
   } catch (error) {
@@ -138,7 +149,7 @@ const updatProductInShoppingCart = async (req, res) => {
       .status(500)
       .json({ error: "Error updating product quantity" + error.message });
   }
-};
+});
 const deleteProductInShoppingCart = async (req, res) => {
   try {
     // const  email = req.headers.email;
@@ -147,41 +158,43 @@ const deleteProductInShoppingCart = async (req, res) => {
 
     const user = req.user;
     const { productId } = req.params;
-    const userCart = await findCurrentUserShoppingCart(user.id);
+    let userCart = await findCurrentUserShoppingCart(user.id);
     if (!userCart) {
       res.status(404).json("The cart for the current user was not found");
       return;
     }
-    const itemIndex = userCart.items.find((item) =>
-      item.productId.equals(productId)
-    );
-    if (!itemIndex) {
+    const itemIndex = userCart.items.findIndex((item) => {
+      return item.productId._id.toString() === productId;
+    });
+    console.log(itemIndex);
+
+    if (itemIndex == -1) {
       res
         .status(404)
         .json("The item with the given ID was not found in the cart");
       return;
     }
-    userCart.items.splice(itemIndex, 1);
+    userCart.items = userCart.items.filter(
+      (item) => !item.productId.equals(productId)
+    );
+    // const cart = await ShoppingCart.findOneAndUpdate(
+    //   { user: req.user._id },
+    //   { $pull: { cartItemSchema: { _id: req.params.itemId } } },
+    //   { new: true }
+    // );
 
     let totalPrice = 0;
     userCart.items.forEach((item) => {
+      //console.log(item)
       totalPrice += item.productId.price * item.quantity;
     });
     userCart.price = totalPrice;
     await userCart.save();
     res.json({ message: "Item deleted from cart successfully", userCart });
   } catch (error) {
-    res.status(500).json({ error: "Error deleting product quantity" });
+    res.status(500).json({ err: error.message });
   }
 };
-// const deleteProductInShoppingCart = asyncHandler(async (req, res, next) => {
-//   const cart = await ShoppingCart.findOneByIdAndUpdate(
-//     { user: req.user._id },
-//     { $pull: { cartItemSchema: { _id: req.params.itemId } } },
-//     { new: true }
-//   );
-//   res.status(200).json({ status: "sucsses", data: cart });
-// });
 
 const clearCart = async (req, res) => {
   try {

@@ -24,11 +24,14 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    shiipingAdress: {
-      dedtails: String,
+    shipingAdress: {
+      details: String,
       phone: String,
       city: String,
       postalCode: String,
+      country:String,
+      fullName:String,
+      streetAdress:String
     },
     shiippingPrice: {
       type: Number,

@@ -28,8 +28,8 @@ exports.createCashOrder = asyncHandler(async (req, res, next) => {
     const order = await Order.create({
       user: cart.user,
       cartItems: cart.items,
-      shiipingAdress: req.body.shiipingAdress,
       totalOrderPrice,
+      ...req.body,
     });
 
     //after create order decrement product , increment product
@@ -182,6 +182,73 @@ exports.updateOrderTodelevred = asyncHandler(async (req, res, next) => {
   res.status(200).json({ status: "success", data: updatedOrder });
 });
 
+// exports.checkOut = asyncHandler(async (req, res, next) => {
+//   // app settings
+//   const taxPrice = 0;
+//   const shippingPrice = 0;
+
+//   // 1) Get cart depend on cartId
+//   const cart = await Cart.findById(req.params.cartId);
+//   if (!cart) {
+//     return next(
+//       new ApiError(`There is no such cart with id ${req.params.cartId}, 404`)
+//     );
+//   }
+
+//   // 2) Get order price depend on cart price "Check if coupon apply"
+//   const cartPrice = cart.totalPriceAfterDiscount
+//     ? cart.totalPriceAfterDiscount
+//     : cart.price;
+
+//   const totalOrderPrice = cartPrice + taxPrice + shippingPrice;
+
+//   // CRETE order with payment
+//   const order = await Order.create({
+//     user: cart.user,
+//     cartItems: cart.items,
+//     totalOrderPrice,
+//     ...req.body
+//   });
+
+//       //after create order decrement product , increment product
+//     if (order) {
+//       const bulkOption = cart.items.map((item) => ({
+//         updateOne: {
+//           filter: { _id: item.product },
+//           update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
+//         },
+//       }));
+//       await Product.bulkWrite(bulkOption, {});
+
+//     }
+
+//   const user = await User.findById(cart.user);
+
+//   // 3) Create stripe checkout session
+//   const session = await stripe.checkout.sessions.create({
+//     line_items: [
+//       {
+//         price_data: {
+//           product_data: { name: "jjjjjjj", description: "jjjjjj" },
+//           unit_amount: totalOrderPrice * 100,
+//           currency: "egp",
+//         },
+//         quantity: 1,
+//       },
+//     ],
+//     mode: "payment",
+//     success_url: `${req.protocol}://${req.get("host")}/orders`,
+//     cancel_url: ` ${req.protocol}://${req.get("host")}/cart`,
+//     customer_email: user.email,
+//     client_reference_id: req.params.cartId,
+//     // metadata: "jjjjjjj",
+//   });
+//   await Cart.findByIdAndDelete(req.params.cartId);
+
+//   // 4) send session to response
+//   res.status(200).json({ status: "success", session });
+// });
+
 exports.checkOut = asyncHandler(async (req, res, next) => {
   // app settings
   const taxPrice = 0;
@@ -201,6 +268,26 @@ exports.checkOut = asyncHandler(async (req, res, next) => {
     : cart.price;
 
   const totalOrderPrice = cartPrice + taxPrice + shippingPrice;
+
+  // CREATE order with payment
+  const order = await Order.create({
+    user: cart.user,
+    cartItems: cart.items,
+    totalOrderPrice,
+    ...req.body,
+  });
+
+  // Decrement product quantity and increment sold count
+  if (order) {
+    const bulkOption = cart.items.map((item) => ({
+      updateOne: {
+        filter: { _id: item.product },
+        update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
+      },
+    }));
+    await Product.bulkWrite(bulkOption, {});
+  }
+
   const user = await User.findById(cart.user);
 
   // 3) Create stripe checkout session
@@ -216,16 +303,23 @@ exports.checkOut = asyncHandler(async (req, res, next) => {
       },
     ],
     mode: "payment",
-    success_url: `${req.protocol}://${req.get("host")}/orders`,
+    success_url: `${req.protocol}://${req.get("host")}/thank-you`,
     cancel_url: ` ${req.protocol}://${req.get("host")}/cart`,
     customer_email: user.email,
     client_reference_id: req.params.cartId,
     // metadata: "jjjjjjj",
   });
 
+  // Remove items from the cart
+  await Cart.updateOne(
+    { _id: req.params.cartId },
+    { $pull: { items: { _id: { $in: cart.items.map((item) => item._id) } } } }
+  );
+
   // 4) send session to response
   res.status(200).json({ status: "success", session });
 });
+
 exports.updateOrderStatus = asyncHandler(async (req, res, next) => {
   const { status } = req.body;
   const order = await Order.findById(req.params.id);
