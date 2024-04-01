@@ -306,10 +306,12 @@ exports.checkOut = asyncHandler(async (req, res, next) => {
       },
     ],
     mode: "payment",
-    success_url: `${req.protocol}://${req.get("host")}/thank-you`,
-    cancel_url: ` ${req.protocol}://${req.get("host")}/cart`,
+    success_url: `http://localhost:4200/thank-you`,
+    cancel_url: "http://localhost:4200/cart",
+
     customer_email: user.email,
     client_reference_id: req.params.cartId,
+
     // metadata: "jjjjjjj",
   });
 
