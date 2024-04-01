@@ -25,10 +25,13 @@ const orderSchema = new mongoose.Schema(
       default: 0,
     },
     shiipingAdress: {
-      dedtails: String,
+      details: String,
       phone: String,
       city: String,
       postalCode: String,
+      country:string,
+      fullName:string,
+      streetAdress:string
     },
     shiippingPrice: {
       type: Number,
