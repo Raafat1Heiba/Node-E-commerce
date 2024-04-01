@@ -6,6 +6,8 @@ const ShoppingCart = require("../models/shoppingModel");
 const User = require("../models/userModel");
 const { findUserByEmail } = require("../services/userService");
 const { findProductById } = require("../services/productService");
+const asyncHandler = require("express-async-handler");
+const { findByIdAndUpdate } = require("../models/productModel");
 
 const getCurrentUserShoppingCart = async (req, res) => {
   try {
@@ -25,9 +27,6 @@ const addBProductsToshoppingCart = async (req, res) => {
   try {
     let { productId, quantity } = req.body;
     console.log(quantity);
-    // const  email = req.headers.email;
-    // const findUser = await findUserByEmail(email)
-    // const user= findUser._id
     let mess = "";
     const user = req.user;
     let userCart = await findCurrentUserShoppingCart(user.id);
@@ -175,6 +174,14 @@ const deleteProductInShoppingCart = async (req, res) => {
     res.status(500).json({ error: "Error deleting product quantity" });
   }
 };
+// const deleteProductInShoppingCart = asyncHandler(async (req, res, next) => {
+//   const cart = await ShoppingCart.findOneByIdAndUpdate(
+//     { user: req.user._id },
+//     { $pull: { cartItemSchema: { _id: req.params.itemId } } },
+//     { new: true }
+//   );
+//   res.status(200).json({ status: "sucsses", data: cart });
+// });
 
 const clearCart = async (req, res) => {
   try {
