@@ -30,7 +30,7 @@ router.put(
   updateOrderTodelevred
 );
 router.post(
-  "checkout-session/:cartId",
+  "/checkout-session/:cartId",
   // authService.allowTo(),
   checkOut
 );
