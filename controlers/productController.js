@@ -28,43 +28,51 @@ exports.uploadProductImage = upload.fields([
   },
 ]);
 exports.resizeImage = asyncHandler(async (req, res, next) => {
+  console.log(req.files)
+  console.log(req.body)
+
   if (req.files.imageCover) {
-    const filename = `product-${uuidv4()}-${Date.now()}-cover.jpeg`;
+    const filename = product-${uuidv4()}-${Date.now()}-cover.jpeg;
 
     await sharp(req.files.imageCover[0].buffer)
       .resize(2000, 1333)
       .toFormat("jpeg")
       .jpeg({ quality: 95 })
-      .toFile(`uploads/categories/${filename}`);
+      .toFile(uploads/categories/${filename});
     req.body.imageCover = filename;
+    console.log("kkkkkkkk")
   }
+
   if (req.files.images) {
     req.body.images = [];
     await Promise.all(
       req.files.images.map(async (img, index) => {
-        const imageName = `product-${uuidv4()}-${Date.now()}-${index + 1}.jpeg`;
+        const imageName = product-${uuidv4()}-${Date.now()}-${index + 1}.jpeg;
 
         await sharp(img.buffer)
           .resize(2000, 1333)
           .toFormat("jpeg")
           .jpeg({ quality: 95 })
-          .toFile(`uploads/categories/${imageName}`);
+          .toFile(uploads/categories/${imageName});
         req.body.images.push(imageName);
       })
     );
-    next();
+
+
+   
   }
+  next();
 });
 exports.get = asyncHandler(async (req, res) => {
   let filterObj = {};
   if (req.params.categoryId) filterObj = { category: req.params.categoryId };
   const queryStringObj = { ...req.query, ...filterObj };
   //console.log(queryStringObj)
-  const excludesFildes = ["page", "sort", "limit", "fields", "keyword"];
+  const excludesFildes = ["page", "sort", "limit", "fields","keyword"];
   excludesFildes.forEach((field) => delete queryStringObj[field]);
   let queryStr = JSON.stringify(queryStringObj);
   //console.log(queryStr)
-  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => $${match});
   //console.log(queryStr)
 
   const page = req.query.page * 1 || 1;
@@ -73,45 +81,50 @@ exports.get = asyncHandler(async (req, res) => {
   const endIndex = page * limit;
   const pagination = {};
   let documentCount;
-
+  
   let query = {};
-  //search
-  if (req.query.keyword) {
-    if (product.modelName === "Product") {
-      query.$or = [
-        { title: { $regex: req.query.keyword, $options: "i" } },
-        { description: { $regex: req.query.keyword, $options: "i" } },
-      ];
-    } else {
-      query = { title: { $regex: req.query.keyword, $options: "i" } };
+    //search
+    if (req.query.keyword) {
+      
+      if (product.modelName === "Product") {
+        query.$or = [
+          { title: { $regex: req.query.keyword, $options: "i" } },
+          { description: { $regex: req.query.keyword, $options: "i" } },
+
+        ];
+      } else {
+        query = { title: { $regex: req.query.keyword, $options: "i" } };
+      }
     }
-  }
-  //console.log(queryStr)
-  if (req.params.categoryId) {
-    query = { ...query, ...filterObj };
-    console.log(query, "1");
-  }
-  const parsed = JSON.parse(queryStr);
-  query = { ...query, ...parsed };
-  console.log(query);
+    //console.log(queryStr)
+    if (req.params.categoryId) {
+      query = {...query,...filterObj};
+    console.log(query,"1")
+
+    }
+    const parsed=JSON.parse(queryStr)
+    query={...query, ...parsed}
+    console.log(query)
 
   //build query
-  let fliterdProducts = await product.find(query);
-  //await mongooseQuery;
-  if (req.query.sort) {
-    const sortBy = req.query.sort.split(",").join(" ");
-    fliterdProducts = fliterdProducts.sort(sortBy);
-  } else {
-    fliterdProducts = fliterdProducts.sort("-createAt");
-  }
+  let mongooseQuery = product
+    .find(query)
+  let fliterdProducts= await mongooseQuery;
 
-  mongooseQuery = fliterdProducts
+  mongooseQuery = product
+  .find(query)
     .skip(skip)
     .limit(limit)
     .populate({ path: "category", select: "name" });
 
+    
   //sorting
-
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    mongooseQuery = mongooseQuery.sort(sortBy);
+  } else {
+    mongooseQuery = mongooseQuery.sort("-createAt");
+  }
   //fields
   if (req.query.fields) {
     const fields = req.query.fields.split(",").join(" ");
@@ -126,7 +139,8 @@ exports.get = asyncHandler(async (req, res) => {
 
   //pagination
 
-  documentCount = fliterdProducts.length;
+
+  documentCount = fliterdProducts.length  
 
   pagination.currentPage = page;
   pagination.limit = limit;
@@ -138,7 +152,7 @@ exports.get = asyncHandler(async (req, res) => {
   if (skip > 0) {
     pagination.prevPage = page - 1;
   }
-  const paginationResult = pagination;
+  const paginationResult=pagination;
   res
     .status(200)
     .json({ results: products.length, paginationResult, data: products });
@@ -169,14 +183,16 @@ exports.update = asyncHandler(async (req, res, next) => {
 });
 exports.delete = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  const products = await product.deleteOne({ _id: id });
+  const products = await product.deleteOne({_id:id});
   if (!products) {
     return next(new ApiError("products not found", 404));
   }
-  res.status(200).send({ message: "deleted", products });
+  res.status(200).send({message:"deleted",products});
 });
 exports.create = asyncHandler(async (req, res) => {
+  //console.log(req.body)
   req.body.slug = slugify(req.body.title);
+  //console.log(req.body)
   const products = await product.create(req.body);
   res.status(201).json({ data: products });
 });
