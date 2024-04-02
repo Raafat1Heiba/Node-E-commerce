@@ -15,14 +15,13 @@ router.get(
 router.patch(
   "/",
   auth,
-  // controllers.resizeImage,
-  // controllers.uploadUserImage,
+  controllers.resizeImage,
+  controllers.uploadUserImage,
   controllers.updateCurrentUserProfile
 );
 router.patch(
   "/password",
-  // controllers.resizeImage,
-  // controllers.uploadUserImage,
+
   controllers.updatePassword
 );
 

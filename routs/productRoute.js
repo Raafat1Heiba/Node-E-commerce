@@ -12,15 +12,15 @@ router.get("/", main.get);
 router.get("/:id", getProductValidator, main.getId);
 router.post(
   "/",
-  //main.uploadProductImage,
-  //main.resizeImage,
+  main.uploadProductImage,
+  main.resizeImage,
   createProductValidator,
   main.create
 );
 router.put(
   "/:id",
-  // main.uploadProductImage,
-  // main.resizeImage,
+  main.uploadProductImage,
+  main.resizeImage,
   updateProductValidator,
   main.update
 );
