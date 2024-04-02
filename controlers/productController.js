@@ -100,9 +100,9 @@ exports.get = asyncHandler(async (req, res) => {
   //await mongooseQuery;
   if (req.query.sort) {
     const sortBy = req.query.sort.split(",").join(" ");
-    fliterdProducts = await fliterdProducts.sort(sortBy);
+    fliterdProducts = fliterdProducts.sort(sortBy);
   } else {
-    fliterdProducts = await fliterdProducts.sort("-createAt");
+    fliterdProducts = fliterdProducts.sort("-createAt");
   }
 
   mongooseQuery = fliterdProducts
