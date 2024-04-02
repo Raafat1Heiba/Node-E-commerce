@@ -306,7 +306,7 @@ exports.checkOut = asyncHandler(async (req, res, next) => {
       },
     ],
     mode: "payment",
-    success_url: `http://localhost:4200/thank-you`,
+    success_url: `http://localhost:4200/thank-you/${order._id}`,
     cancel_url: "http://localhost:4200/cart",
 
     customer_email: user.email,
