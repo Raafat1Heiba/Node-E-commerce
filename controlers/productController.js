@@ -32,13 +32,13 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
   console.log(req.body)
 
   if (req.files.imageCover) {
-    const filename = `product-${uuidv4()}-${Date.now()}-cover.jpeg`;
+    const filename = product-${uuidv4()}-${Date.now()}-cover.jpeg;
 
     await sharp(req.files.imageCover[0].buffer)
       .resize(2000, 1333)
       .toFormat("jpeg")
       .jpeg({ quality: 95 })
-      .toFile(`uploads/categories/${filename}`);
+      .toFile(uploads/categories/${filename});
     req.body.imageCover = filename;
     console.log("kkkkkkkk")
   }
@@ -47,13 +47,13 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
     req.body.images = [];
     await Promise.all(
       req.files.images.map(async (img, index) => {
-        const imageName = `product-${uuidv4()}-${Date.now()}-${index + 1}.jpeg`;
+        const imageName = product-${uuidv4()}-${Date.now()}-${index + 1}.jpeg;
 
         await sharp(img.buffer)
           .resize(2000, 1333)
           .toFormat("jpeg")
           .jpeg({ quality: 95 })
-          .toFile(`uploads/categories/${imageName}`);
+          .toFile(uploads/categories/${imageName});
         req.body.images.push(imageName);
       })
     );
@@ -72,7 +72,7 @@ exports.get = asyncHandler(async (req, res) => {
   excludesFildes.forEach((field) => delete queryStringObj[field]);
   let queryStr = JSON.stringify(queryStringObj);
   //console.log(queryStr)
-  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => $${match});
   //console.log(queryStr)
 
   const page = req.query.page * 1 || 1;
