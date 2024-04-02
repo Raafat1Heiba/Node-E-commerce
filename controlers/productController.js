@@ -96,16 +96,16 @@ exports.get = asyncHandler(async (req, res) => {
   console.log(query);
 
   //build query
-  let mongooseQuery = product.find(query);
-  await mongooseQuery;
+  let fliterdProducts = await product.find(query);
+  //await mongooseQuery;
   if (req.query.sort) {
     const sortBy = req.query.sort.split(",").join(" ");
-    mongooseQuery = mongooseQuery.sort(sortBy);
+    fliterdProducts = await fliterdProducts.sort(sortBy);
   } else {
-    mongooseQuery = mongooseQuery.sort("-createAt");
+    fliterdProducts = await fliterdProducts.sort("-createAt");
   }
 
-  mongooseQuery = mongooseQuery
+  mongooseQuery = fliterdProducts
     .skip(skip)
     .limit(limit)
     .populate({ path: "category", select: "name" });
