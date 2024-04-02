@@ -69,10 +69,29 @@ const updateCurrentUserProfile = async (req, res) => {
     return;
   }
 };
+const updatePassword = async (req, res) => {
+  try {
+    const email = req.body.email;
+    const user = User.findUserByEmail(email);
+    if (!user) {
+      return res.status(404).send("incorrect email");
+    }
+
+    const passwordHash = await bcrypt.hash(req.body.password, 10);
+    await User.updateOne({ email }, { passwordHash });
+
+    //const updatedUser = await findUserByEmail(user.email);
+    res.send({ message: "updated" });
+  } catch (error) {
+    res.status(404).send("Invalid request" + error.message);
+    return;
+  }
+};
 
 module.exports = {
   getCurrentUserProfile,
   updateCurrentUserProfile,
   uploadUserImage,
   resizeImage,
+  updatePassword,
 };

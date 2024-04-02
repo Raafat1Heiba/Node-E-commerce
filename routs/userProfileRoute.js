@@ -19,5 +19,11 @@ router.patch(
   // controllers.uploadUserImage,
   controllers.updateCurrentUserProfile
 );
+router.patch(
+  "/password",
+  // controllers.resizeImage,
+  // controllers.uploadUserImage,
+  controllers.updatePassword
+);
 
 module.exports = router;
