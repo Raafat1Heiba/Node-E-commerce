@@ -14,7 +14,7 @@ router.post(
   "/",
   main.uploadProductImage,
   main.resizeImage,
-  createProductValidator,
+  // createProductValidator,
   main.create
 );
 router.put(

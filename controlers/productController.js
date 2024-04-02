@@ -28,6 +28,9 @@ exports.uploadProductImage = upload.fields([
   },
 ]);
 exports.resizeImage = asyncHandler(async (req, res, next) => {
+  console.log(req.files)
+  console.log(req.body)
+
   if (req.files.imageCover) {
     const filename = `product-${uuidv4()}-${Date.now()}-cover.jpeg`;
 
@@ -37,7 +40,9 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
       .jpeg({ quality: 95 })
       .toFile(`uploads/categories/${filename}`);
     req.body.imageCover = filename;
+    console.log("kkkkkkkk")
   }
+
   if (req.files.images) {
     req.body.images = [];
     await Promise.all(
@@ -52,8 +57,11 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
         req.body.images.push(imageName);
       })
     );
-    next();
+
+
+   
   }
+  next();
 });
 exports.get = asyncHandler(async (req, res) => {
   let filterObj = {};
@@ -91,32 +99,32 @@ exports.get = asyncHandler(async (req, res) => {
     //console.log(queryStr)
     if (req.params.categoryId) {
       query = {...query,...filterObj};
-    console.log(query,"1")
 
     }
     const parsed=JSON.parse(queryStr)
     query={...query, ...parsed}
-    console.log(query)
 
   //build query
   let mongooseQuery = product
-    .find(query)
-  let fliterdProducts= await mongooseQuery;
+   .find(query)
+  let allProducts= await mongooseQuery;
+  console.log(allProducts)
+
+
+    //sorting
+    const sortBy=req.query.sort?req.query.sort.split(",").join(" ") : "-createdAt"
+
 
   mongooseQuery = product
   .find(query)
+  .sort(sortBy)
     .skip(skip)
     .limit(limit)
     .populate({ path: "category", select: "name" });
 
+
     
-  //sorting
-  if (req.query.sort) {
-    const sortBy = req.query.sort.split(",").join(" ");
-    mongooseQuery = mongooseQuery.sort(sortBy);
-  } else {
-    mongooseQuery = mongooseQuery.sort("-createAt");
-  }
+
   //fields
   if (req.query.fields) {
     const fields = req.query.fields.split(",").join(" ");
@@ -132,7 +140,7 @@ exports.get = asyncHandler(async (req, res) => {
   //pagination
 
 
-  documentCount = fliterdProducts.length  
+  documentCount = allProducts.length  
 
   pagination.currentPage = page;
   pagination.limit = limit;
@@ -147,7 +155,7 @@ exports.get = asyncHandler(async (req, res) => {
   const paginationResult=pagination;
   res
     .status(200)
-    .json({ results: products.length, paginationResult, data: products });
+    .json({ results: products.length,documentCount, paginationResult, data: products });
 });
 exports.getId = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
@@ -182,7 +190,9 @@ exports.delete = asyncHandler(async (req, res, next) => {
   res.status(200).send({message:"deleted",products});
 });
 exports.create = asyncHandler(async (req, res) => {
+  //console.log(req.body)
   req.body.slug = slugify(req.body.title);
+  //console.log(req.body)
   const products = await product.create(req.body);
   res.status(201).json({ data: products });
 });
