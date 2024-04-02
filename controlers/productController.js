@@ -69,7 +69,7 @@ exports.get = asyncHandler(async (req, res) => {
   excludesFildes.forEach((field) => delete queryStringObj[field]);
   let queryStr = JSON.stringify(queryStringObj);
   //console.log(queryStr)
-  queryStr = queryStr.replace(`/\b(gte|gt|lte|lt)\b/g, (match) => $${match}`);
+  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
   //console.log(queryStr)
 
   const page = req.query.page * 1 || 1;
@@ -94,29 +94,27 @@ exports.get = asyncHandler(async (req, res) => {
   //console.log(queryStr)
   if (req.params.categoryId) {
     query = { ...query, ...filterObj };
-    console.log(query, "1");
   }
   const parsed = JSON.parse(queryStr);
   query = { ...query, ...parsed };
-  console.log(query);
 
   //build query
   let mongooseQuery = product.find(query);
-  let fliterdProducts = await mongooseQuery;
+  let allProducts = await mongooseQuery;
+  console.log(allProducts);
+
+  //sorting
+  const sortBy = req.query.sort
+    ? req.query.sort.split(",").join(" ")
+    : "-createdAt";
 
   mongooseQuery = product
     .find(query)
+    .sort(sortBy)
     .skip(skip)
     .limit(limit)
     .populate({ path: "category", select: "name" });
 
-  //sorting
-  if (req.query.sort) {
-    const sortBy = req.query.sort.split(",").join(" ");
-    mongooseQuery = mongooseQuery.sort(sortBy);
-  } else {
-    mongooseQuery = mongooseQuery.sort("-createAt");
-  }
   //fields
   if (req.query.fields) {
     const fields = req.query.fields.split(",").join(" ");
@@ -131,7 +129,7 @@ exports.get = asyncHandler(async (req, res) => {
 
   //pagination
 
-  documentCount = fliterdProducts.length;
+  documentCount = allProducts.length;
 
   pagination.currentPage = page;
   pagination.limit = limit;
@@ -146,7 +144,12 @@ exports.get = asyncHandler(async (req, res) => {
   const paginationResult = pagination;
   res
     .status(200)
-    .json({ results: products.length, paginationResult, data: products });
+    .json({
+      results: products.length,
+      documentCount,
+      paginationResult,
+      data: products,
+    });
 });
 exports.getId = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
