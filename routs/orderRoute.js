@@ -18,7 +18,7 @@ const {
 router.route("/:cartId").post(createCashOrder);
 router.route("/:id").get(getOne);
 router.route("/status/:status").get(getOrdersByStatus);
-router.route("/user/:id").get(getUserOrders);
+router.route("/user").get(getUserOrders);
 router.put(
   "/:id/pay",
   // authService.allowTo("admin", "manager"),
