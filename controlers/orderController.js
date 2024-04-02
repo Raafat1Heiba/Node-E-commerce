@@ -288,8 +288,9 @@ exports.getUserOrders = asyncHandler(async (req, res, next) => {
     res.status(200).json({ data: orders });
   } catch (error) {
     console.log(error.message);
-
-    return next(new ApiError("order not found", 404));
+    res.status(404).send({
+      message: error.message,
+    });
   }
 });
 exports.getOrdersByStatus = asyncHandler(async (req, res, next) => {
