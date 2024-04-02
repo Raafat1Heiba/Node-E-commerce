@@ -277,12 +277,12 @@ exports.getUserOrders = asyncHandler(async (req, res, next) => {
   try {
     //const id = req.params.id;
     const user = req.user;
-    const orders = await Order.find({ user: user._id }).populate({
+    const orders = await Order.find({ user: user.id }).populate({
       path: "cartItems",
       populate: { path: " productId", model: "Product" },
     });
     if (!orders) {
-      return next(new ApiError("order not found", 404));
+      return next({ message: "no orders" });
       //return res.status(400).json({ msg: "Category not found" });
     }
     res.status(200).json({ data: orders });
