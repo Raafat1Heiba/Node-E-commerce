@@ -19,7 +19,6 @@ const {
 router.route("/:cartId").post(createCashOrder);
 router.route("/user").get(auth, getUserOrders);
 
-router.route("/:id").get(getOne);
 router.route("/status/:status").get(getOrdersByStatus);
 
 router.put(
@@ -39,4 +38,6 @@ router.post(
 );
 router.get("/", auth, getOrders);
 router.put("/:id/status", updateOrderStatus);
+router.route("/:id").get(getOne);
+
 module.exports = router;
