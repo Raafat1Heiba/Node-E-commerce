@@ -105,8 +105,7 @@ exports.get = asyncHandler(async (req, res) => {
     mongooseQuery = mongooseQuery.sort("-createAt");
   }
 
-  mongooseQuery = product
-    .find(query)
+  mongooseQuery = fliterdProducts
     .skip(skip)
     .limit(limit)
     .populate({ path: "category", select: "name" });
