@@ -9,12 +9,13 @@ const auth = async (req, res, next) => {
   try {
     // eslint-disable-next-line dot-notation
     const token = req.headers["jwt"];
+    console.log(token);
     if (!token) {
       return res.status(401).send({ message: "unauthorized user" });
     }
     const payload = jwt.verify(token, "jwtSecret");
     const { email } = payload;
-    const user = await User.findOne({email});
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).send({ message: "unauthorized user" });
     }

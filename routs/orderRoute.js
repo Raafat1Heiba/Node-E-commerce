@@ -1,7 +1,8 @@
 // eslint-disable-next-line import/newline-after-import
 const express = require("express");
 const router = express.Router();
-const auth = require("../midleWare/auth");
+const { auth } = require("../midleWare/auth");
+
 //import auth controller
 const {
   createCashOrder,
@@ -16,9 +17,11 @@ const {
 } = require("../controlers/orderController");
 // router.use(authController.allowedTo("user"), authController.protect);
 router.route("/:cartId").post(createCashOrder);
+router.route("/user").get(auth, getUserOrders);
+
 router.route("/:id").get(getOne);
 router.route("/status/:status").get(getOrdersByStatus);
-router.get("/user", auth.auth, getUserOrders);
+
 router.put(
   "/:id/pay",
   // authService.allowTo("admin", "manager"),
@@ -34,6 +37,6 @@ router.post(
   // authService.allowTo(),
   checkOut
 );
-router.get("/", auth.auth, getOrders);
+router.get("/", auth, getOrders);
 router.put("/:id/status", updateOrderStatus);
 module.exports = router;

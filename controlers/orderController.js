@@ -276,6 +276,7 @@ exports.updateOrderStatus = asyncHandler(async (req, res, next) => {
 exports.getUserOrders = asyncHandler(async (req, res, next) => {
   try {
     //const id = req.params.id;
+
     const user = req.user;
     const orders = await Order.find({ user: user.id }).populate({
       path: "cartItems",
@@ -287,7 +288,7 @@ exports.getUserOrders = asyncHandler(async (req, res, next) => {
     }
     res.status(200).json({ data: orders });
   } catch (error) {
-    console.log(error.message);
+    //console.log(error.message);
     res.status(404).send({
       message: error.message,
     });
