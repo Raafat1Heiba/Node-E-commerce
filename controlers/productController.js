@@ -28,8 +28,8 @@ exports.uploadProductImage = upload.fields([
   },
 ]);
 exports.resizeImage = asyncHandler(async (req, res, next) => {
-  console.log(req.files);
-  console.log(req.body);
+  //console.log(req.files);
+  //console.log(req.body);
 
   if (req.files.imageCover) {
     const filename = `product-${uuidv4()}-${Date.now()}-cover.jpeg`;
@@ -38,9 +38,9 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
       .resize(2000, 1333)
       .toFormat("jpeg")
       .jpeg({ quality: 95 })
-      .toFile(`../../Angular/E-commerce-angular/src/assets/images/products/${filename}`);
+      .toFile(`uploads/products/${filename}`);
+      // .toFile(`../../Angular/E-commerce-Angular/src/assets/images/products/${filename}`);
     req.body.imageCover = filename;
-    console.log("kkkkkkkk");
   }
 
   if (req.files.images) {
@@ -53,7 +53,8 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
           .resize(2000, 1333)
           .toFormat("jpeg")
           .jpeg({ quality: 95 })
-          .toFile(`../../Angular/E-commerce-Angular/src/assets/images/products/${imageName}`);
+          .toFile(`uploads/products/${imageName}`);
+         // .toFile(`../../Angular/E-commerce-Angular/src/assets/images/products/${imageName}`);
         req.body.images.push(imageName);
       })
     );
@@ -101,7 +102,7 @@ exports.get = asyncHandler(async (req, res) => {
   //build query
   let mongooseQuery = product.find(query);
   let allProducts = await mongooseQuery;
-  console.log(allProducts);
+  //console.log(allProducts);
 
   //sorting
   const sortBy = req.query.sort
@@ -167,7 +168,7 @@ exports.update = asyncHandler(async (req, res, next) => {
     req.body.slug = slugify(req.body.title);
   }
 
-  const products = await product.findOneAndUpdate({ _id: id }, req.body, {
+  const products = await product.findOneAndUpdate({ _id: id }, {...req.body,price:+req.body.price,quantity:+req.body.quantity}, {
     new: true,
   });
   if (!products) {
@@ -183,10 +184,16 @@ exports.delete = asyncHandler(async (req, res, next) => {
   }
   res.status(200).send({ message: "deleted", products });
 });
+// exports.create = asyncHandler(async (req, res) => {
+  
+//   //console.log(req.body)
+//   req.body.slug = slugify(req.body.title);
+//   //console.log(req.body)
+//   const products = await product.create(req.body);
+//   res.status(201).json({ data: products });
+// });
 exports.create = asyncHandler(async (req, res) => {
-  //console.log(req.body)
   req.body.slug = slugify(req.body.title);
-  //console.log(req.body)
-  const products = await product.create(req.body);
-  res.status(201).json({ data: products });
+  const products = await product.create({...req.body,price:+req.body.price,quantity:+req.body.quantity});
+  res.status(201).json(products);
 });
