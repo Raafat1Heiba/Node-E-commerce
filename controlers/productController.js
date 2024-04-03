@@ -28,8 +28,8 @@ exports.uploadProductImage = upload.fields([
   },
 ]);
 exports.resizeImage = asyncHandler(async (req, res, next) => {
-  console.log(req.files)
-  console.log(req.body)
+  console.log(req.files);
+  console.log(req.body);
 
   if (req.files.imageCover) {
     const filename = `product-${uuidv4()}-${Date.now()}-cover.jpeg`;
@@ -40,7 +40,7 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
       .jpeg({ quality: 95 })
       .toFile(`../../Angular/E-commerce-angular/src/assets/images/products/${filename}`);
     req.body.imageCover = filename;
-    console.log("kkkkkkkk")
+    console.log("kkkkkkkk");
   }
 
   if (req.files.images) {
@@ -57,9 +57,6 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
         req.body.images.push(imageName);
       })
     );
-
-
-   
   }
   next();
 });
@@ -68,7 +65,7 @@ exports.get = asyncHandler(async (req, res) => {
   if (req.params.categoryId) filterObj = { category: req.params.categoryId };
   const queryStringObj = { ...req.query, ...filterObj };
   //console.log(queryStringObj)
-  const excludesFildes = ["page", "sort", "limit", "fields","keyword"];
+  const excludesFildes = ["page", "sort", "limit", "fields", "keyword"];
   excludesFildes.forEach((field) => delete queryStringObj[field]);
   let queryStr = JSON.stringify(queryStringObj);
   //console.log(queryStr)
@@ -81,49 +78,42 @@ exports.get = asyncHandler(async (req, res) => {
   const endIndex = page * limit;
   const pagination = {};
   let documentCount;
-  
+
   let query = {};
-    //search
-    if (req.query.keyword) {
-      
-      if (product.modelName === "Product") {
-        query.$or = [
-          { title: { $regex: req.query.keyword, $options: "i" } },
-          { description: { $regex: req.query.keyword, $options: "i" } },
-
-        ];
-      } else {
-        query = { title: { $regex: req.query.keyword, $options: "i" } };
-      }
+  //search
+  if (req.query.keyword) {
+    if (product.modelName === "Product") {
+      query.$or = [
+        { title: { $regex: req.query.keyword, $options: "i" } },
+        { description: { $regex: req.query.keyword, $options: "i" } },
+      ];
+    } else {
+      query = { title: { $regex: req.query.keyword, $options: "i" } };
     }
-    //console.log(queryStr)
-    if (req.params.categoryId) {
-      query = {...query,...filterObj};
-
-    }
-    const parsed=JSON.parse(queryStr)
-    query={...query, ...parsed}
+  }
+  //console.log(queryStr)
+  if (req.params.categoryId) {
+    query = { ...query, ...filterObj };
+  }
+  const parsed = JSON.parse(queryStr);
+  query = { ...query, ...parsed };
 
   //build query
-  let mongooseQuery = product
-   .find(query)
-  let allProducts= await mongooseQuery;
-  console.log(allProducts)
+  let mongooseQuery = product.find(query);
+  let allProducts = await mongooseQuery;
+  console.log(allProducts);
 
-
-    //sorting
-    const sortBy=req.query.sort?req.query.sort.split(",").join(" ") : "-createdAt"
-
+  //sorting
+  const sortBy = req.query.sort
+    ? req.query.sort.split(",").join(" ")
+    : "-createdAt";
 
   mongooseQuery = product
-  .find(query)
-  .sort(sortBy)
+    .find(query)
+    .sort(sortBy)
     .skip(skip)
     .limit(limit)
     .populate({ path: "category", select: "name" });
-
-
-    
 
   //fields
   if (req.query.fields) {
@@ -139,8 +129,7 @@ exports.get = asyncHandler(async (req, res) => {
 
   //pagination
 
-
-  documentCount = allProducts.length  
+  documentCount = allProducts.length;
 
   pagination.currentPage = page;
   pagination.limit = limit;
@@ -152,10 +141,15 @@ exports.get = asyncHandler(async (req, res) => {
   if (skip > 0) {
     pagination.prevPage = page - 1;
   }
-  const paginationResult=pagination;
+  const paginationResult = pagination;
   res
     .status(200)
-    .json({ results: products.length,documentCount, paginationResult, data: products });
+    .json({
+      results: products.length,
+      documentCount,
+      paginationResult,
+      data: products,
+    });
 });
 exports.getId = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
@@ -183,11 +177,11 @@ exports.update = asyncHandler(async (req, res, next) => {
 });
 exports.delete = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  const products = await product.deleteOne({_id:id});
+  const products = await product.deleteOne({ _id: id });
   if (!products) {
     return next(new ApiError("products not found", 404));
   }
-  res.status(200).send({message:"deleted",products});
+  res.status(200).send({ message: "deleted", products });
 });
 exports.create = asyncHandler(async (req, res) => {
   //console.log(req.body)
