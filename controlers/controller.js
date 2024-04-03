@@ -22,7 +22,7 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
     .resize(600, 600)
     .toFormat("jpeg")
     .jpeg({ quality: 95 })
-    .toFile(`uploads/categories/${filename}`);
+    .toFile(`../../Angular/E-commerce-Angular/src/assets/images/products/categories/${filename}`);
 
   req.body.image = filename;
   next();

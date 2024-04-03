@@ -38,7 +38,7 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
       .resize(2000, 1333)
       .toFormat("jpeg")
       .jpeg({ quality: 95 })
-      .toFile(`uploads/categories/${filename}`);
+      .toFile(`../../Angular/E-commerce-angular/src/assets/images/products/${filename}`);
     req.body.imageCover = filename;
     console.log("kkkkkkkk")
   }
@@ -53,7 +53,7 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
           .resize(2000, 1333)
           .toFormat("jpeg")
           .jpeg({ quality: 95 })
-          .toFile(`uploads/categories/${imageName}`);
+          .toFile(`../../Angular/E-commerce-Angular/src/assets/images/products/${imageName}`);
         req.body.images.push(imageName);
       })
     );
