@@ -28,9 +28,6 @@ exports.uploadProductImage = upload.fields([
   },
 ]);
 exports.resizeImage = asyncHandler(async (req, res, next) => {
-  //console.log(req.files);
-  //console.log(req.body);
-
   if (req.files.imageCover) {
     const filename = `product-${uuidv4()}-${Date.now()}-cover.jpeg`;
 
@@ -126,9 +123,6 @@ exports.get = asyncHandler(async (req, res) => {
 
   //excute
   const products = await mongooseQuery;
-  //console.log(products.length)
-
-  //pagination
 
   documentCount = allProducts.length;
 
@@ -186,14 +180,7 @@ exports.delete = asyncHandler(async (req, res, next) => {
   }
   res.status(200).send({ message: "deleted", products });
 });
-// exports.create = asyncHandler(async (req, res) => {
 
-//   //console.log(req.body)
-//   req.body.slug = slugify(req.body.title);
-//   //console.log(req.body)
-//   const products = await product.create(req.body);
-//   res.status(201).json({ data: products });
-// });
 exports.create = asyncHandler(async (req, res) => {
   req.body.slug = slugify(req.body.title);
   const products = await product.create({
