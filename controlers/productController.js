@@ -142,14 +142,12 @@ exports.get = asyncHandler(async (req, res) => {
     pagination.prevPage = page - 1;
   }
   const paginationResult = pagination;
-  res
-    .status(200)
-    .json({
-      results: products.length,
-      documentCount,
-      paginationResult,
-      data: products,
-    });
+  res.status(200).json({
+    results: products.length,
+    documentCount,
+    paginationResult,
+    data: products,
+  });
 });
 exports.getId = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
@@ -184,9 +182,7 @@ exports.delete = asyncHandler(async (req, res, next) => {
   res.status(200).send({ message: "deleted", products });
 });
 exports.create = asyncHandler(async (req, res) => {
-  //console.log(req.body)
   req.body.slug = slugify(req.body.title);
-  //console.log(req.body)
   const products = await product.create(req.body);
   res.status(201).json({ data: products });
 });
