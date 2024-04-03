@@ -4,6 +4,7 @@ const router = express.Router();
 
 const controllers = require("../controlers/reviews");
 const { auth } = require("../midleWare/auth");
+const { isAdmin } = require("../midleWare/Admin");
 
 router.get("/:id/reviews", controllers.getProductReviews);
 router.post("/:id/ratings", auth, controllers.addProductRating);

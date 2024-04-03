@@ -25,6 +25,7 @@ const resizeImage = asyncHandler(async (req, res, next) => {
     .toFormat("jpeg")
     .jpeg({ quality: 95 })
     .toFile(`uploads/users/${filename}`);
+    //.toFile(`../../Angular/E-commerce-Angular/src/assets/images/users/${filename}`);
 
   req.body.image = filename;
   next();

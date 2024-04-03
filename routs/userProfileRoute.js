@@ -3,14 +3,18 @@ const express = require("express");
 const router = express.Router();
 
 const controllers = require("../controlers/userProfileController");
+
+const { isAdmin } = require("../midleWare/Admin");
 const { auth } = require("../midleWare/auth");
-//const { isAdmin } = require("../middleware/admin");
 
 router.get(
   "/",
   auth,
-
   controllers.getCurrentUserProfile
+);
+router.patch(
+  "/password",
+  controllers.updatePassword
 );
 router.patch(
   "/",
@@ -19,10 +23,6 @@ router.patch(
   controllers.uploadUserImage,
   controllers.updateCurrentUserProfile
 );
-router.patch(
-  "/password",
 
-  controllers.updatePassword
-);
 
 module.exports = router;

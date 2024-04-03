@@ -13,9 +13,9 @@ const { auth } = require("../midleWare/auth");
 const router = express.Router();
 
 router.use(auth);
-router.get("/", getCurrentUserShoppingCart);
-router.post("/", addBProductsToshoppingCart);
-router.patch("/update/:productId", updatProductInShoppingCart);
-router.delete("/remove/:productId", deleteProductInShoppingCart);
-router.delete("/clear", clearCart);
+router.get("/", auth, getCurrentUserShoppingCart);
+router.post("/", auth, addBProductsToshoppingCart);
+router.patch("/update/:productId",auth, updatProductInShoppingCart);
+router.delete("/remove/:productId", auth,deleteProductInShoppingCart);
+router.delete("/clear",auth, clearCart);
 module.exports = router;
