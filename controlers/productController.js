@@ -28,9 +28,6 @@ exports.uploadProductImage = upload.fields([
   },
 ]);
 exports.resizeImage = asyncHandler(async (req, res, next) => {
-  //console.log(req.files);
-  //console.log(req.body);
-
   if (req.files.imageCover) {
     const filename = `product-${uuidv4()}-${Date.now()}-cover.jpeg`;
 
@@ -39,7 +36,7 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
       .toFormat("jpeg")
       .jpeg({ quality: 95 })
       .toFile(`uploads/products/${filename}`);
-      // .toFile(`../../Angular/E-commerce-Angular/src/assets/images/products/${filename}`);
+    // .toFile(`../../Angular/E-commerce-Angular/src/assets/images/products/${filename}`);
     req.body.imageCover = filename;
   }
 
@@ -54,7 +51,7 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
           .toFormat("jpeg")
           .jpeg({ quality: 95 })
           .toFile(`uploads/products/${imageName}`);
-         // .toFile(`../../Angular/E-commerce-Angular/src/assets/images/products/${imageName}`);
+        // .toFile(`../../Angular/E-commerce-Angular/src/assets/images/products/${imageName}`);
         req.body.images.push(imageName);
       })
     );
@@ -126,9 +123,6 @@ exports.get = asyncHandler(async (req, res) => {
 
   //excute
   const products = await mongooseQuery;
-  //console.log(products.length)
-
-  //pagination
 
   documentCount = allProducts.length;
 
@@ -143,14 +137,12 @@ exports.get = asyncHandler(async (req, res) => {
     pagination.prevPage = page - 1;
   }
   const paginationResult = pagination;
-  res
-    .status(200)
-    .json({
-      results: products.length,
-      documentCount,
-      paginationResult,
-      data: products,
-    });
+  res.status(200).json({
+    results: products.length,
+    documentCount,
+    paginationResult,
+    data: products,
+  });
 });
 exports.getId = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
@@ -168,9 +160,13 @@ exports.update = asyncHandler(async (req, res, next) => {
     req.body.slug = slugify(req.body.title);
   }
 
-  const products = await product.findOneAndUpdate({ _id: id }, {...req.body,price:+req.body.price,quantity:+req.body.quantity}, {
-    new: true,
-  });
+  const products = await product.findOneAndUpdate(
+    { _id: id },
+    { ...req.body, price: +req.body.price, quantity: +req.body.quantity },
+    {
+      new: true,
+    }
+  );
   if (!products) {
     return next(new ApiError("products not found", 404));
   }
@@ -184,16 +180,13 @@ exports.delete = asyncHandler(async (req, res, next) => {
   }
   res.status(200).send({ message: "deleted", products });
 });
-// exports.create = asyncHandler(async (req, res) => {
-  
-//   //console.log(req.body)
-//   req.body.slug = slugify(req.body.title);
-//   //console.log(req.body)
-//   const products = await product.create(req.body);
-//   res.status(201).json({ data: products });
-// });
+
 exports.create = asyncHandler(async (req, res) => {
   req.body.slug = slugify(req.body.title);
-  const products = await product.create({...req.body,price:+req.body.price,quantity:+req.body.quantity});
+  const products = await product.create({
+    ...req.body,
+    price: +req.body.price,
+    quantity: +req.body.quantity,
+  });
   res.status(201).json(products);
 });
