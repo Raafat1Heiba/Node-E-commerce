@@ -9,6 +9,7 @@ const { v4: uuidv4 } = require("uuid");
 
 const multerStorage = multer.memoryStorage();
 const multerFilter = function (req, file, cb) {
+  
   if (file.mimetype.startsWith("image")) {
     cb(null, true);
   } else {
@@ -18,6 +19,7 @@ const multerFilter = function (req, file, cb) {
 const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 const uploadUserImage = upload.single("image");
 const resizeImage = asyncHandler(async (req, res, next) => {
+  if (req.files.image) {
   const filename = ` user-${uuidv4()}-${Date.now()}.jpeg`;
 
   await sharp(req.file.buffer)
@@ -28,6 +30,7 @@ const resizeImage = asyncHandler(async (req, res, next) => {
     //.toFile(`../../Angular/E-commerce-Angular/src/assets/images/users/${filename}`);
 
   req.body.image = filename;
+  }
   next();
 });
 
