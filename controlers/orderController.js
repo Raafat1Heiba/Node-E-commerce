@@ -231,7 +231,7 @@ exports.checkOut = asyncHandler(async (req, res, next) => {
     line_items: [
       {
         price_data: {
-          product_data: { name: "complete payment", description: "" },
+          product_data: { name: "complete payment", description: "-------" },
           unit_amount: totalOrderPrice * 100,
           currency: "egp",
         },

@@ -21,9 +21,9 @@ router.get("/:id", getcategoryValidator, main.getId);
 
 router.post(
   "/",
-  // main.uploadCategoryImage,
-  // main.resizeImage,
-  createcategoryValidator,
+   main.uploadCategoryImage,
+   main.resizeImage,
+  //createcategoryValidator,
   main.create
 );
 router.put(

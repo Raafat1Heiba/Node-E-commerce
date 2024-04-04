@@ -35,8 +35,8 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
       .resize(2000, 1333)
       .toFormat("jpeg")
       .jpeg({ quality: 95 })
-      .toFile(`uploads/products/${filename}`);
-    // .toFile(`../../Angular/E-commerce-Angular/src/assets/images/products/${filename}`);
+      //.toFile(`uploads/products/${filename}`);
+     .toFile(`../../Angular/E-commerce-Angular/src/assets/images/products/${filename}`);
     req.body.imageCover = filename;
   }
 

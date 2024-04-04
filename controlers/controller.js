@@ -7,6 +7,7 @@ const asyncHandler = require("express-async-handler");
 
 const multerStorage = multer.memoryStorage();
 const multerFilter = function (req, file, cb) {
+  console.log(req.body)
   if (file.mimetype.startsWith("image")) {
     cb(null, true);
   } else {
@@ -22,7 +23,8 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
     .resize(600, 600)
     .toFormat("jpeg")
     .jpeg({ quality: 95 })
-    .toFile(`../../Angular/E-commerce-Angular/src/assets/images/products/categories/${filename}`);
+    .toFile(`uploads/categories/${filename}`);
+    //.toFile(`../../Angular/E-commerce-Angular/src/assets/images/categories/${filename}`);
 
   req.body.image = filename;
   next();
@@ -124,6 +126,7 @@ exports.delete = asyncHandler(async (req, res, next) => {
 exports.create = asyncHandler(async (req, res) => {
   // eslint-disable-next-line prefer-destructuring
   const { name, image } = req.body;
+  console.log(req.body)
   // eslint-disable-next-line new-cap
   const newCategory = await new categoryModel({ name, image });
   newCategory
