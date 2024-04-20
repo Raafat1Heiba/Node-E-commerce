@@ -1,8 +1,5 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 const multer = require("multer");
-// eslint-disable-next-line import/no-extraneous-dependencies
 const sharp = require("sharp");
-// eslint-disable-next-line import/no-extraneous-dependencies
 const { v4: uuidv4 } = require("uuid");
 const asyncHandler = require("express-async-handler");
 const ApiError = require("../utils/error");
@@ -30,7 +27,6 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
     .toFormat("jpeg")
     .jpeg({ quality: 95 })
     .toFile(`uploads/categories/${filename}`);
-  // // Save image into our db
   req.body.image = filename;
   next();
 });
@@ -39,7 +35,6 @@ exports.get = asyncHandler(async (req, res) => {
   const queryStringObj = { ...req.query };
   const excludesFildes = ["page", "sort", "limit", "fields"];
   excludesFildes.forEach((field) => delete queryStringObj[field]);
-  //Apply filtration using [gte | gt | lte | lt]
   let queryStr = JSON.stringify(queryStringObj);
   queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
   const page = req.query.page * 1 || 1;
@@ -97,12 +92,10 @@ exports.get = asyncHandler(async (req, res) => {
     .json({ results: brands.length, paginationResult, data: brands });
 });
 exports.getId = asyncHandler(async (req, res, next) => {
-  // eslint-disable-next-line prefer-destructuring
   const id = req.params.id;
   const brand = await brandModel.findById(id);
   if (!brand) {
     return next(new ApiError("brand not found", 404));
-    //  return res.status(400).json({ msg: "Category not found" });
   }
   res.status(200).json({ data: brand });
 });
@@ -117,7 +110,6 @@ exports.update = asyncHandler(async (req, res, next) => {
   if (!brand) {
     return next(new ApiError("brand not found", 404));
   }
-  // return res.status(400).json({ msg: "Category not found" });
   res.status(200).json(brand);
 });
 exports.delete = asyncHandler(async (req, res, next) => {
@@ -126,13 +118,10 @@ exports.delete = asyncHandler(async (req, res, next) => {
   if (!brand) {
     return next(new ApiError("brand not found", 404));
   }
-  // return res.status(400).json({ msg: "Category not found" });
   res.status(200).send();
 });
 exports.create = asyncHandler(async (req, res) => {
-  // eslint-disable-next-line prefer-destructuring
   const { name, image } = req.body;
-  // eslint-disable-next-line new-cap
   const newBrand = await new brandModel({ name, image });
   newBrand
     .save()
